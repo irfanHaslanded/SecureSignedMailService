@@ -1,0 +1,30 @@
+{
+	"folders": [
+		{
+			"path": "SSMS"
+		}
+	],
+	"settings": {
+
+		"search.followSymlinks": false,
+
+		// vscode-clangd settings
+		"clangd.arguments": [
+			"--compile-commands-dir=build",
+			"--clang-tidy",
+			"--completion-style=detailed",
+			"--header-insertion=never",
+			"--suggest-missing-includes",
+			"--header-insertion-decorators",
+			"--compile_args_from=filesystem",
+			"--background-index",
+			"-j=32"
+		],
+		"clangd.semanticHighlighting": false,
+
+		// Microsoft C/C++ settings
+		"C_Cpp.intelliSenseEngine": "Disabled",
+		"C_Cpp.autocomplete": "Disabled",
+		"C_Cpp.errorSquiggles": "Disabled",
+	}
+}
