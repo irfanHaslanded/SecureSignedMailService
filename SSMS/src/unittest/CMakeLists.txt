@@ -8,7 +8,8 @@ set(CMAKE_INCLUDE_PATH ${GTEST_ROOTDIR}/include)
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 
-add_executable(Test_ssms Test_Ssms.cpp)
+add_executable(Test_ssms Test_Ssms.cpp Test_Cli.cpp Test_Crypto.cpp
+Test_MailBox.cpp Test_User.cpp)
 target_link_libraries(Test_ssms
     ${GTEST_BOTH_LIBRARIES} pthread crypto crypt
     )
