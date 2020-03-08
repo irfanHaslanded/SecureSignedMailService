@@ -7,19 +7,21 @@
 #include "User.h"
 
 namespace ssms {
+
 class MailBox {
 
+using Msg = std::pair<std::string, std::string>;
+
 public:
-  MailBox() = default;
-  ~MailBox() = default;
-  bool SendMsg(const User& to, const std::string msg);
-  std::string ReadReceivedMsgs();
-  std::string ReadSentMsgs();
+  MailBox(const User& owner);
+  void SendMsg(MailBox& to, const std::string& plain_msg);
+  std::list<Msg> GetReceivedMsgs();
 
 private:
-  std::list<std::string> mailbox_;
+  const User& owner_;
+  std::list<Msg> mailbox_;
 };
 
 }
 
-#endif
+#endif // SSMS_MAILBOX_H_

@@ -3,19 +3,25 @@
 
 namespace ssms {
 
-MailBox::SendMsg(const int &to, const std::string msg)
+MailBox::MailBox(const User& owner) : owner_{owner} {};
+
+void MailBox::SendMsg(MailBox& to, const std::string& plain_msg)
 {
-  //mailbox_.push_back(Crypto::Encrypt(msg, priv_key));
+  to.mailbox_.emplace_back(
+      std::make_pair(owner_.GetName(),
+                     Crypto::Encrypt(plain_msg, to.owner_.GetPublicKey())));
 }
 
-MailBox::ReadReceivedMsgs(const int &to)
+std::list<Msg> MailBox::GetReceivedMsgs()
 {
-  ;
-}
-
-MailBox::ReadSentMsgs(const int &to)
-{
-  ;
+  std::list<Msg> decrypted_received_msgs;
+  for (const auto &msg : mailbox_)
+  {
+    decrypted_received_msgs.emplace_back(
+        std::make_pair(msg.first,
+                       Crypto::Decrypt(msg.second, owner_.GetPrivateKey())));
+  }
+  return decrypted_received_msgs;
 }
 
 }
