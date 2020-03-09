@@ -2,6 +2,8 @@
 * Class for handling users, including
 * creating users, deleting, sending msgs etc.
 */
+#ifndef SSMS_USER_H_
+#define SSMS_USER_H_
 
 #include "SSMS.h"
 #include "MailBox.h"
@@ -25,8 +27,8 @@ namespace ssms {
     //enough to store IDs or usernames?
     void addContact(std::string username);
     void addContact(std::string username, std::string nickname);
-    void addContact(int userId);
-    void addContact(int userId, std::string nickname);
+    void addContactById(int userId);
+    void addContactById(int userId, std::string nickname);
 
     void showInbox();
     void listMessagesFrom(User sender);
@@ -52,3 +54,4 @@ namespace ssms {
   };
 
 }
+#endif //Include guard
