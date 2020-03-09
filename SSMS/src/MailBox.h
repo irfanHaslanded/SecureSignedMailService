@@ -14,8 +14,8 @@ using Msg = std::pair<std::string, std::string>;
 
 public:
   MailBox(const User& owner);
-  void SendMsg(MailBox& to, const std::string& plain_msg);
-  std::list<Msg> GetReceivedMsgs();
+  void sendMsg(MailBox& to, const std::string& plain_msg);
+  std::list<Msg> getReceivedMsgs() const;
 
 private:
   const User& owner_;
