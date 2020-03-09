@@ -4,8 +4,10 @@
 */
 
 #include "SSMS.h"
+#include "MailBox.h"
+#include <map>
 
-namespace identifier {
+namespace ssms {
 
   class User {
 
@@ -16,37 +18,37 @@ namespace identifier {
 
     std::string toString();
 
-    void setPassword(std::string &password){};
-    void login();
+    void setPassword(std::string &password);
+    bool login(const std::string &password);
     void logout();
 
-    MailBox inbox;
-    MailBox outbox;
-
     //enough to store IDs or usernames?
-    std::list <User> contacts;
     void addContact(std::string username);
     void addContact(std::string username, std::string nickname);
     void addContact(int userId);
     void addContact(int userId, std::string nickname);
 
-    void listInbox();
+    void showInbox();
     void listMessagesFrom(User sender);
 
     void displayMessage(int msgId);
     void sendMessage(std::string msg, User recipient);
     void createMessage(std::string msg, User recipient);
+    void deleteMessage(int id);
     void sendAll();
+
+    int getId();
 
   private:
     //need to decide size of integers.
-    int salt;
+    std::string salt;
     int Id;
-    std::string name;
-    int password;     //Todo: fix. Name, type?
-  }
+    std::string hash;     //Todo: fix. Name, type?
 
+    std::map<std::string name, User user> userMap;
 
-
+    MailBox inbox;
+    MailBox outbox;
+  };
 
 }
