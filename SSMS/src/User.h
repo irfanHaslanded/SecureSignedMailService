@@ -5,7 +5,6 @@
 #ifndef SSMS_USER_H_
 #define SSMS_USER_H_
 
-#include "SSMS.h"
 #include "MailBox.h"
 #include <map>
 
@@ -15,8 +14,8 @@ namespace ssms {
 
 
   public:
-    User(std::string name){};
-    ~User();
+    User(std::string name) : inbox(*this)  {};
+    //~User();
 
     std::string toString();
 
@@ -47,10 +46,10 @@ namespace ssms {
     int Id;
     std::string hash;     //Todo: fix. Name, type?
 
-    std::map<std::string name, User user> userMap;
+    std::map<std::string, User> userMap;
 
     MailBox inbox;
-    MailBox outbox;
+    //MailBox outbox;
   };
 
 }

@@ -4,9 +4,16 @@
 #include <string>
 #include <list>
 
-#include "User.h"
-
 namespace ssms {
+
+  /**
+   * A message consists of two parts
+   * @param first The name of the sender user
+   * @param second The body of the message
+   */
+using Msg = std::pair<std::string, std::string>;
+
+class User;
 
 /**
  * MailBox class. Each user has a MailBox, via which
@@ -15,13 +22,6 @@ namespace ssms {
  * encrypted messages from other users.
  */
 class MailBox {
-
-  /**
-   * A message consists of two parts
-   * @param first The name of the sender user
-   * @param second The body of the message
-   */
-using Msg = std::pair<std::string, std::string>;
 
 public:
   /**

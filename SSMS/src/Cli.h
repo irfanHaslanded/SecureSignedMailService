@@ -1,5 +1,8 @@
 #ifndef SSMS_CLI_H_
 #define SSMS_CLI_H_
+
+#include "User.h"
+
 namespace ssms{
 class Cli
 {
@@ -16,7 +19,7 @@ class Cli
     bool deleteUser(User &user);
     bool logIn(std::string username, std::string password);
     std::list<User> users;
-    User &loggedInUser;
+    User *loggedInUser;
 };
 }
 #endif
