@@ -6,9 +6,13 @@
  */
 
 #include "Crypto.h"
-using namespace ssms;
+#include <crypt.h>
 
-static const std::string hashValidChars[65] = {
+
+
+namespace ssms {
+
+static const std::string hashValidChars {
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./"};
 
 std::string Crypto::encrypt(const std::string &message,
@@ -22,24 +26,45 @@ std::string Crypto::decrypt(const std::string &message,
 }
 
 bool Crypto::validatePassword(const User &user, const std::string &password) {
+
+  //std::string salt = get the salt of the user
+  std::string hash = genHash(salt, password);
+
+
   return true;
 }
 
-void Crypto::passTheSalt(std::string &saltstring) {
-  char j = 0;
-  unsigned char saltData[16] = "";
-  char SALT_STRING[] = {"$6$................$"};
+std::string Crypto::genPassword(const std::string &password) {
 
-  size_t saltStringLen = strnlen(SALT_STRING, 21);
-  size_t saltSize = saltStringLen - 4;
+  std::string salt = passTheSalt();
 
+  return genHash(salt, password);
+
+}
+
+ std::string Crypto::passTheSalt() {
+  int j = 0;
+  const int saltSize = 16;
+  unsigned char saltData[saltSize] = "";
   RAND_bytes(saltData, saltSize);
 
-  saltstring = "$6$";
+  std::string saltstring = "$6$";
 
   for (j = 0; j < saltSize; j++) {
-    saltstring += hashValidChars[saltData[j] & 0x3fu];
+    saltstring += hashValidChars[saltData[j] % hashValidChars.size()];
   }
-
-  saltstring += "$";
+  return saltstring + "$";
 }
+
+std::string Crypto::genHash(const std::string &salt,
+                            const std::string &rawPwd) {
+  struct crypt_data buf;
+  buf.initialized = 0;
+  
+  char *encPwd =
+      crypt_r(rawPwd.c_str(), salt.c_str(), &buf);
+  std::string s(encPwd);
+  std::cout<< s << std::endl; //for UT debugging purposes
+  return s;
+}
+} 

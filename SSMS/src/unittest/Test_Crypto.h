@@ -12,6 +12,8 @@ class Test_Crypto : testing::Test {
 public:
   Test_Crypto();
   virtual ~Test_Crypto();
+  void SetUp();
+  void TearDown();
 };
 
 #endif /* SRC_UNITTEST_CRYTO_H_ */

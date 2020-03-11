@@ -8,7 +8,7 @@ set(CMAKE_INCLUDE_PATH ${GTEST_ROOTDIR}/include)
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 
-add_executable(Test_ssms Test_Ssms.cpp Test_Cli.cpp Test_Crypto.cpp
+add_executable(Test_ssms Test_Ssms.cpp Test_Cli.cpp ../MailBox.cpp ../Crypto.cpp ../User.cpp Test_Crypto.cpp
 Test_MailBox.cpp Test_User.cpp)
 target_link_libraries(Test_ssms
     ${GTEST_BOTH_LIBRARIES} pthread crypto crypt
@@ -18,6 +18,7 @@ add_test(Test_ssms Test_ssms)
 
 add_custom_target(test 
                    DEPENDS Test_ssms
-                   COMMAND ctest -V )
+                   COMMAND ctest -V 
+                   )
 
 
