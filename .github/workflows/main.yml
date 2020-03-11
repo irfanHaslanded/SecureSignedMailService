@@ -1,0 +1,24 @@
+name: make-master
+
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: '20 13 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - id: LoadGtest
+      - name: action-gtest
+        uses: CyberZHG/github-action-gtest@0.0.1
+ 
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: 1
+      - name: Run Makefile
+        env:
+          TOKEN: ${{ secrets.TOKEN }}
+        run: cd SSMS; make all
