@@ -36,3 +36,4 @@
 *.cproject
 *.launch
 RemoteSystemsTempFiles/
+SSMS/.settings/
