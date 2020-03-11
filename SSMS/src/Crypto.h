@@ -8,22 +8,23 @@
 #ifndef SSMS_CRYPTO_H
 #define SSMS_CRYPTO_H
 
-#include <string>
+#include <cstring>
 #include <iostream>
+#include <openssl/rand.h>
+#include <string>
 
 #include "User.h"
 
-namespace ssms
-{
+namespace ssms {
 
-class Crypto
-{
+class Crypto {
 public:
   std::string encrypt(const std::string &message, const std::string &publickey);
-  std::string decrypt(const std::string &message, const std::string &privatekey);
-  bool validatePassword(const User& user, const std::string &password);
-
+  std::string decrypt(const std::string &message,
+                      const std::string &privatekey);
+  bool validatePassword(const User &user, const std::string &password);
+  void passTheSalt(std::string &saltstring);
 };
-};
+}; // namespace ssms
 
 #endif
