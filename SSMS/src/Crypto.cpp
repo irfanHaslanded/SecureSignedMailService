@@ -9,22 +9,18 @@
 using namespace ssms;
 
 
-Crypto::Crypto() // constructor
+std::string Crypto::encrypt(const std::string &message, const std::string &publickey)
 {
+  return std::string();
 }
 
-Crypto::~Crypto()
+std::string Crypto::decrypt(const std::string &message, const std::string &privatekey)
 {
+  return std::string();
 }
 
-void Crypto::encrypt(std::string message)
+bool Crypto::validatePassword(const User& user, const std::string &password)
 {
+  return true;
 }
 
-void Crypto::decrypt(std::string message)
-{
-}
-
-void Crypto::validatePassword(std::string message)
-{
-}

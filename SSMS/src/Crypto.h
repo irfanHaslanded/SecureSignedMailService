@@ -11,21 +11,17 @@
 #include <string>
 #include <iostream>
 
+#include "User.h"
+
 namespace ssms
 {
 
 class Crypto
 {
 public:
-  /*Constructor*/
-  Crypto();
-  /*Destructor*/
-  virtual ~Crypto();
-
-private:
-  void encrypt(std::string message);
-  void decrypt(std::string message);
-  void validatePassword(std::string password);
+  std::string encrypt(const std::string &message, const std::string &publickey);
+  std::string decrypt(const std::string &message, const std::string &privatekey);
+  bool validatePassword(const User& user, const std::string &password);
 
 };
 };
