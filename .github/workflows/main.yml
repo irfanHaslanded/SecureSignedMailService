@@ -11,10 +11,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - id: LoadGtest
-      - name: action-gtest
-        uses: CyberZHG/github-action-gtest@0.0.1
- 
+      - uses: CyberZHG/github-action-gtest@0.0.1
       - uses: actions/checkout@master
         with:
           fetch-depth: 1
