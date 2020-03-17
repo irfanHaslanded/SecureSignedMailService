@@ -5,23 +5,26 @@
 #ifndef SSMS_USER_H_
 #define SSMS_USER_H_
 
-#include "MailBox.h"
 #include <map>
 
 namespace ssms {
 
+  class MailBox;
+
   class User {
 
-
   public:
-    User(std::string name) : inbox(*this)  {};
-    //~User();
+    User(const std::string& name);
+    ~User();
 
-    std::string toString();
+    static int getNextId();
+    std::string getName() const;
+    std::string toString() const;
+    std::string getPrivateKey() const;
+    std::string getPublicKey() const;
 
-    void setPassword(std::string &password);
-    bool login(const std::string &password);
-    void logout();
+    void setPassword(const std::string& password);
+    bool checkPassword(const std::string &password) const;
 
     //enough to store IDs or usernames?
     void addContact(std::string username);
@@ -41,15 +44,17 @@ namespace ssms {
     int getId();
 
   private:
-    //need to decide size of integers.
-    std::string salt;
-    int Id;
-    std::string hash;     //Todo: fix. Name, type?
-
-    std::map<std::string, User> userMap;
-
-    MailBox inbox;
+    int id_;
+    std::string name_;
+    std::string hash_;
+    std::string salt_;
+    std::string private_key_;
+    std::string public_key_;
+    MailBox *inbox_;
     //MailBox outbox;
+
+    static std::map<std::string, User*> userMap_;
+    static int nextId_;
   };
 
 }

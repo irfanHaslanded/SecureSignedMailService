@@ -3,6 +3,8 @@
 
 #include "User.h"
 
+#include <list>
+
 namespace ssms{
 class Cli
 {
