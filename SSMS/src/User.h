@@ -17,7 +17,8 @@ namespace ssms {
     User(const std::string& name);
     ~User();
 
-    static int getNextId();
+    void setName(const std::string& name);
+    void setKeyPair();
     std::string getName() const;
     std::string toString() const;
     std::string getPrivateKey() const;
@@ -36,7 +37,7 @@ namespace ssms {
     void listMessagesFrom(User sender);
 
     void displayMessage(int msgId);
-    void sendMessage(std::string msg, User recipient);
+    void sendMessage(const std::string& msg, const User& recipient);
     void createMessage(std::string msg, User recipient);
     void deleteMessage(int id);
     void sendAll();
@@ -44,17 +45,15 @@ namespace ssms {
     int getId();
 
   private:
-    int id_;
+    std::string id_;
     std::string name_;
     std::string hash_;
-    std::string salt_;
     std::string private_key_;
     std::string public_key_;
     MailBox *inbox_;
     //MailBox outbox;
 
     static std::map<std::string, User*> userMap_;
-    static int nextId_;
   };
 
 }

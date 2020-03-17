@@ -31,11 +31,10 @@ public:
   MailBox(const User& owner);
 
   /**
-   * Send encrypted message
-   * @param to Recipient user's inbox
+   * Throw message encrypted to the mailbox
    * @param plain_msg Text of the message
    */
-  void sendMsg(MailBox& to, const std::string& plain_msg);
+  void throwMsg(const std::string& plain_msg);
 
   /**
    * Get all the received messages

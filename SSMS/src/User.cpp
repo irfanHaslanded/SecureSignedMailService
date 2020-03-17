@@ -4,14 +4,17 @@
 
 namespace ssms {
 
-int User::nextId_(0);
 std::map<std::string, User*> User::userMap_{};
 
-User::User(const std::string& name) : name_(name)
-                                    , id_(getNextId())
-                                    , inbox_(new MailBox(*this))
+User::User(const std::string& id) : id_(id)
+                                  , inbox_(new MailBox(*this))
 {
-  userMap_.emplace(name, this);
+  this->setKeyPair();
+  auto const& ret = userMap_.emplace(id_, this);
+  if (!ret.second)
+  {
+    throw "User with id '" + id + "' already exists";
+  }
 }
 
 User::~User()
@@ -20,9 +23,15 @@ User::~User()
   delete inbox_;
 }
 
-int User::getNextId()
+void User::setName(const std::string& name)
 {
-  return nextId_++;
+  name_ = name;
+}
+
+void User::setKeyPair()
+{
+  private_key_ = "TODO: generate private key";
+  public_key_ = "TODO: generate public key";
 }
 
 std::string User::getName() const
@@ -55,11 +64,23 @@ bool User::checkPassword(const std::string &password) const
   return Crypto::validatePassword(hash_, password);
 }
 
+void User::sendMessage(const std::string& msg, const User& recipient)
+{
+  recipient.inbox_->throwMsg(msg);
+}
+
 void User::showInbox()
 {
   for (const auto& it : inbox_->getReceivedMsgs())
   {
-    std::cout << "From: " << it.first << " Msg: " << Crypto::decrypt(it.second, private_key_) << std::endl;
+    auto search = userMap_.find(it.first); // sender might already be deleted or just having no name set
+    std::cout << "From: "
+              << (search != userMap_.end() && !search->second->getName().empty()
+                     ? search->second->getName()
+                     : it.first)
+              << " Msg: "
+              << Crypto::decrypt(it.second, private_key_)
+              << std::endl;
   }
 }
 
