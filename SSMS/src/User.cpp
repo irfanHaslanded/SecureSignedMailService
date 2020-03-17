@@ -10,8 +10,7 @@ User::User(const std::string& id) : id_(id)
                                   , inbox_(new MailBox(*this))
 {
   this->setKeyPair();
-  auto const& ret = userMap_.emplace(id_, this);
-  if (!ret.second)
+  if (!userMap_.emplace(id_, this).second)
   {
     throw "User with id '" + id + "' already exists";
   }
@@ -19,7 +18,7 @@ User::User(const std::string& id) : id_(id)
 
 User::~User()
 {
-  userMap_.erase(name_);
+  userMap_.erase(id_);
   delete inbox_;
 }
 
