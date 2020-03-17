@@ -33,22 +33,27 @@ void User::setKeyPair()
   public_key_ = "TODO: generate public key";
 }
 
-std::string User::getName() const
+const std::string& User::getId() const
+{
+  return id_;
+}
+
+const std::string& User::getName() const
 {
   return name_;
 }
 
 std::string User::toString() const
 {
-  return getName();
+  return name_;
 }
 
-std::string User::getPrivateKey() const
+const std::string& User::getPrivateKey() const
 {
   return private_key_;
 }
 
-std::string User::getPublicKey() const
+const std::string& User::getPublicKey() const
 {
   return public_key_;
 }
@@ -72,7 +77,7 @@ void User::showInbox()
 {
   for (const auto& it : inbox_->getReceivedMsgs())
   {
-    auto search = userMap_.find(it.first); // sender might already be deleted or just having no name set
+    const auto search = userMap_.find(it.first); // sender might already be deleted or just having no name set
     std::cout << "From: "
               << (search != userMap_.end() && !search->second->getName().empty()
                      ? search->second->getName()

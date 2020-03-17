@@ -9,7 +9,7 @@ MailBox::MailBox(const User& owner) : owner_{owner} {};
 void MailBox::throwMsg(const std::string& plain_msg)
 {
   mailbox_.emplace_back(
-      std::make_pair(owner_.getName(),
+      std::make_pair(owner_.getId(),
                      Crypto::encrypt(plain_msg, owner_.getPublicKey())));
 }
 

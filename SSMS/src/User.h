@@ -19,10 +19,11 @@ namespace ssms {
 
     void setName(const std::string& name);
     void setKeyPair();
-    std::string getName() const;
+    const std::string& getId() const;
+    const std::string& getName() const;
     std::string toString() const;
-    std::string getPrivateKey() const;
-    std::string getPublicKey() const;
+    const std::string& getPrivateKey() const;
+    const std::string& getPublicKey() const;
 
     void setPassword(const std::string& password);
     bool checkPassword(const std::string &password) const;
