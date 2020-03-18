@@ -38,6 +38,7 @@ namespace ssms {
     void listMessagesFrom(User sender);
 
     void displayMessage(int msgId);
+    bool sendMessage(const std::string& recipient_id, const std::string& msg);
     void sendMessage(const User& recipient, const std::string& msg);
     void createMessage(std::string msg, User recipient);
     void deleteMessage(int id);

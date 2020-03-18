@@ -23,6 +23,8 @@ TEST(Test_User, SendMessage)
   User alice("Alice");
   User bob("Bob");
 
-  alice.sendMessage(bob, "Hello Bob! It's Alice");
+  ASSERT_EQ(bob.showInbox(), 0);
+  ASSERT_EQ(bob.showInbox(), 0);
+  ASSERT_TRUE(alice.sendMessage("Bob", "Hello Bob! It's Alice"));
   ASSERT_EQ(bob.showInbox(), 1);
 }

@@ -68,6 +68,17 @@ bool User::checkPassword(const std::string &password) const
   return Crypto::validatePassword(hash_, password);
 }
 
+bool User::sendMessage(const std::string& recipient_id, const std::string& msg)
+{
+  auto recipient = userMap_.find(recipient_id);
+  if (recipient == userMap_.end())
+  {
+    return false;
+  }
+  sendMessage(*recipient->second, msg);
+  return true;
+}
+
 void User::sendMessage(const User& recipient, const std::string& msg)
 {
   recipient.inbox_->throwMsg(*this, msg);
