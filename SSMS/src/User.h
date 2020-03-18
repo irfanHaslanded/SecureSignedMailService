@@ -14,7 +14,7 @@ namespace ssms {
   class User {
 
   public:
-    User(const std::string& name);
+    User(const std::string& id);
     ~User();
 
     void setName(const std::string& name);
@@ -34,11 +34,11 @@ namespace ssms {
     void addContactById(int userId);
     void addContactById(int userId, std::string nickname);
 
-    void showInbox();
+    size_t showInbox();
     void listMessagesFrom(User sender);
 
     void displayMessage(int msgId);
-    void sendMessage(const std::string& msg, const User& recipient);
+    void sendMessage(const User& recipient, const std::string& msg);
     void createMessage(std::string msg, User recipient);
     void deleteMessage(int id);
     void sendAll();

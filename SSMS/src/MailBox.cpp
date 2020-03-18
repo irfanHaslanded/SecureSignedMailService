@@ -6,10 +6,10 @@ namespace ssms {
 
 MailBox::MailBox(const User& owner) : owner_{owner} {};
 
-void MailBox::throwMsg(const std::string& plain_msg)
+void MailBox::throwMsg(const User& from, const std::string& plain_msg)
 {
   mailbox_.emplace_back(
-      std::make_pair(owner_.getId(),
+      std::make_pair(from.getId(),
                      Crypto::encrypt(plain_msg, owner_.getPublicKey())));
 }
 

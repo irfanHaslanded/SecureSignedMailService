@@ -32,9 +32,10 @@ public:
 
   /**
    * Throw message encrypted to the mailbox
+   * @param from      Sender of the message
    * @param plain_msg Text of the message
    */
-  void throwMsg(const std::string& plain_msg);
+  void throwMsg(const User& from, const std::string& plain_msg);
 
   /**
    * Get all the received messages

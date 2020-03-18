@@ -17,12 +17,12 @@ static const std::string hashValidChars {
 
 std::string Crypto::encrypt(const std::string &message,
                             const std::string &publickey) {
-  return std::string();
+  return message;
 }
 
 std::string Crypto::decrypt(const std::string &message,
                             const std::string &privatekey) {
-  return std::string();
+  return message;
 }
 
 bool Crypto::validatePassword(const std::string &hash, const std::string &password)

@@ -68,24 +68,25 @@ bool User::checkPassword(const std::string &password) const
   return Crypto::validatePassword(hash_, password);
 }
 
-void User::sendMessage(const std::string& msg, const User& recipient)
+void User::sendMessage(const User& recipient, const std::string& msg)
 {
-  recipient.inbox_->throwMsg(msg);
+  recipient.inbox_->throwMsg(*this, msg);
 }
 
-void User::showInbox()
+size_t User::showInbox()
 {
-  for (const auto& it : inbox_->getReceivedMsgs())
+  const auto receivedMsgs = inbox_->getReceivedMsgs();
+  for (const auto& it : receivedMsgs)
   {
     const auto search = userMap_.find(it.first); // sender might already be deleted or just having no name set
-    std::cout << "From: "
-              << (search != userMap_.end() && !search->second->getName().empty()
+    std::cout << (search != userMap_.end() && !search->second->getName().empty()
                      ? search->second->getName()
                      : it.first)
-              << " Msg: "
+              << ": "
               << Crypto::decrypt(it.second, private_key_)
               << std::endl;
   }
+  return receivedMsgs.size();
 }
 
 }
