@@ -3,7 +3,15 @@
 #include "Cli.h"
 
 namespace ssms {
+
+static Cli *cli = NULL;
+
 void Cli::start(void) {
+	cli = new Cli();
+	while(true) {
+		cli->processIo();
+
+	}
 }
 
 Cli::Cli() {
@@ -13,9 +21,18 @@ Cli::~Cli() {
 }
 
 void Cli::processIo() {
+	std::string input;
+	// Just to take input from user
+	std::cout<<"Enter your username:"<< std::endl;
+	std::cin>>input;
+
+//	std::cout<<"Enter your password:";
+//	std::cin>>users;
+
 }
 
 void Cli::printHelpText() {
+	// print help text
 }
 
 std::string Cli::getPrompt() {

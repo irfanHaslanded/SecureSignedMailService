@@ -20,7 +20,7 @@ class Cli
     bool createUser(User &user);
     bool deleteUser(User &user);
     bool logIn(std::string username, std::string password);
-    std::list<User> users;
+    std::map <std::string, User> users;
     User *loggedInUser;
 };
 }

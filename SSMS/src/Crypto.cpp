@@ -28,6 +28,7 @@ std::string Crypto::decrypt(const std::string &message,
 bool Crypto::validatePassword(const std::string &hash, const std::string &password)
 {
   return hash == genHash(Crypto::getSalt(hash), password);
+
 }
 
 std::string Crypto::genPassword(const std::string &password) {
