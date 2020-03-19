@@ -44,3 +44,9 @@ TEST(Test_Crypto, test4DifferentHashes) {
   std::string pwd("karthik123");
       ASSERT_NE(Crypto::genPassword(pwd), Crypto::genPassword(pwd));
 }
+
+TEST(Test_Crypto, validatePassword) {
+  std::string pwd("karthik123");
+  std::string hashPwd(Crypto::genPassword(pwd));
+  ASSERT_TRUE(Crypto::validatePassword(hashPwd, pwd));
+}

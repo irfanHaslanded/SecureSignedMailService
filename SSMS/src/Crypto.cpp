@@ -11,7 +11,8 @@
 
 
 namespace ssms {
-
+const int saltSize = 16;
+const int saltIdSize = 3;  // eaxmple "$6$"
 static const std::string hashValidChars {
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./"};
 
@@ -25,8 +26,8 @@ std::string Crypto::decrypt(const std::string &message,
   return message;
 }
 
-bool Crypto::validatePassword(const std::string &hash, const std::string &password)
-{
+bool Crypto::validatePassword(const std::string &hash,
+                              const std::string &password) {
   return hash == genHash(Crypto::getSalt(hash), password);
 
 }
@@ -34,14 +35,14 @@ bool Crypto::validatePassword(const std::string &hash, const std::string &passwo
 std::string Crypto::genPassword(const std::string &password) {
 
   std::string salt = passTheSalt();
-
+  std::cout << salt << std::endl; // for UT debugging purposes
   return genHash(salt, password);
 
 }
 
  std::string Crypto::passTheSalt() {
   int j = 0;
-  const int saltSize = 16;
+  
   unsigned char saltData[saltSize] = "";
   RAND_bytes(saltData, saltSize);
 
@@ -65,9 +66,9 @@ std::string Crypto::genHash(const std::string &salt,
   return s;
 }
 
-std::string Crypto::getSalt(const std::string &hash)
-{
-  return "TODO";
+std::string Crypto::getSalt(const std::string &hash) {
+  std::string salt(hash.substr(0, saltSize + saltIdSize + 1));
+  std::cout << "salt is  : " + salt << std::endl; // for UT debugging purposes
+  return salt;
 }
-
 } 
