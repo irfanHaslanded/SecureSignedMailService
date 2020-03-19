@@ -6,10 +6,20 @@
 #define SSMS_USER_H_
 
 #include <map>
+#include <exception>
 
 namespace ssms {
 
   class MailBox;
+
+  class UserAlreadyExists : public std::exception {
+    std::string id_;
+    const char* what() const throw() override;
+  public:
+    UserAlreadyExists() = delete;
+    UserAlreadyExists(const std::string& id);
+    std::string getId();
+  };
 
   class User {
 
@@ -43,8 +53,6 @@ namespace ssms {
     void createMessage(std::string msg, User recipient);
     void deleteMessage(int id);
     void sendAll();
-
-    int getId();
 
   private:
     std::string id_;

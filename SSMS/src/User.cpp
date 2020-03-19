@@ -4,16 +4,26 @@
 
 namespace ssms {
 
+// Exception
+const char* UserAlreadyExists::what() const throw()
+{
+  return "User already exists";
+}
+UserAlreadyExists::UserAlreadyExists(const std::string& id) : id_(id) {}
+std::string UserAlreadyExists::getId() { return id_; }
+
+// Static members
 std::map<std::string, User*> User::userMap_{};
 
+// Member methods
 User::User(const std::string& id) : id_(id)
                                   , inbox_(new MailBox(*this))
 {
-  this->setKeyPair();
   if (!userMap_.emplace(id_, this).second)
   {
-    throw "User with id '" + id + "' already exists";
+    throw UserAlreadyExists(id_);
   }
+  this->setKeyPair();
 }
 
 User::~User()
@@ -70,12 +80,12 @@ bool User::checkPassword(const std::string &password) const
 
 bool User::sendMessage(const std::string& recipient_id, const std::string& msg)
 {
-  auto recipient = userMap_.find(recipient_id);
-  if (recipient == userMap_.end())
+  auto user_search = userMap_.find(recipient_id);
+  if (user_search == userMap_.end())
   {
     return false;
   }
-  sendMessage(*recipient->second, msg);
+  sendMessage(*user_search->second, msg);
   return true;
 }
 
@@ -87,15 +97,14 @@ void User::sendMessage(const User& recipient, const std::string& msg)
 size_t User::showInbox()
 {
   const auto receivedMsgs = inbox_->getReceivedMsgs();
-  for (const auto& it : receivedMsgs)
-  {
-    const auto search = userMap_.find(it.first); // sender might already be deleted or just having no name set
-    std::cout << (search != userMap_.end() && !search->second->getName().empty()
-                     ? search->second->getName()
-                     : it.first)
-              << ": "
-              << Crypto::decrypt(it.second, private_key_)
-              << std::endl;
+  for (const auto &msg : receivedMsgs) {
+    const auto user_search =
+        userMap_.find(msg.sender_id); // sender might already be deleted or just
+                                      // having no name set
+    std::cout << (user_search != userMap_.end() && !user_search->second->getName().empty()
+                      ? user_search->second->getName() + " <" + msg.sender_id + ">"
+                      : msg.sender_id)
+              << ": " << Crypto::decrypt(msg.text, private_key_) << std::endl;
   }
   return receivedMsgs.size();
 }

@@ -6,14 +6,14 @@
 
 namespace ssms {
 
-  /**
-   * A message consists of two parts
-   * @param first The name of the sender user
-   * @param second The body of the message
-   */
-using Msg = std::pair<std::string, std::string>;
-
 class User;
+
+struct Msg {
+  const std::string sender_id; /** user id of ther sender */
+  const std::string text;      /** text of the message */
+  Msg(const std::string& sender_id, const std::string& text);
+};
+
 
 /**
  * MailBox class. Each user has a MailBox, via which
@@ -42,6 +42,11 @@ public:
    * @returns a list of decrypted messages
    */
   std::list<Msg> getReceivedMsgs() const;
+
+  /**
+   * Empty inbox
+   */
+  void clear();
 
 private:
   const User& owner_;
