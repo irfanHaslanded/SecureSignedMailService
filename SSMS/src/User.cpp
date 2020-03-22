@@ -91,7 +91,7 @@ bool User::sendMessage(const std::string& recipient_id, const std::string& msg)
 
 void User::sendMessage(const User& recipient, const std::string& msg)
 {
-  recipient.inbox_->throwMsg(*this, msg);
+  recipient.inbox_->throwMsg(Msg(this->getId(), msg));
 }
 
 size_t User::showInbox()

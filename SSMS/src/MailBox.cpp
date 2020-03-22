@@ -7,15 +7,20 @@ namespace ssms {
 // Message
 Msg::Msg(const std::string& sender_id , const std::string& text)
   : sender_id(sender_id) , text(text) {}
+bool Msg::operator==(const Msg& rhs) const
+{
+  return this->sender_id == rhs.sender_id &&
+         this->text      == rhs.text;
+}
 
 // MailBox member methods
 
 MailBox::MailBox(const User& owner) : owner_{owner} {};
 
-void MailBox::throwMsg(const User& sender, const std::string& plain_msg)
+void MailBox::throwMsg(const Msg& msg)
 {
   mailbox_.emplace_back(
-    Msg(sender.getId(), Crypto::encrypt(plain_msg, owner_.getPublicKey())));
+    Msg(msg.sender_id, Crypto::encrypt(msg.text, owner_.getPublicKey())));
 }
 
 std::list<Msg> MailBox::getReceivedMsgs() const

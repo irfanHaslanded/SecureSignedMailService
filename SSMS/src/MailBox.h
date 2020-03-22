@@ -12,6 +12,7 @@ struct Msg {
   const std::string sender_id; /** user id of ther sender */
   const std::string text;      /** text of the message */
   Msg(const std::string& sender_id, const std::string& text);
+  bool operator==(const Msg& rhs) const;
 };
 
 
@@ -32,10 +33,9 @@ public:
 
   /**
    * Throw message encrypted to the mailbox
-   * @param from      Sender of the message
-   * @param plain_msg Text of the message
+   * @param msg Message containing sender id and text
    */
-  void throwMsg(const User& from, const std::string& plain_msg);
+  void throwMsg(const Msg& msg);
 
   /**
    * Get all the received messages

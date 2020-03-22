@@ -14,3 +14,7 @@ Test_Cli::Test_Cli() {
 Test_Cli::~Test_Cli() {
   // TODO Auto-generated destructor stub
 }
+
+TEST(Test_Cli, Dummy)
+{
+}
