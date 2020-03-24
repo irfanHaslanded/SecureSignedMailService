@@ -5,12 +5,12 @@
 #ifndef SSMS_USER_H_
 #define SSMS_USER_H_
 
+#include "MailBox.h"
+
 #include <map>
 #include <exception>
 
 namespace ssms {
-
-class MailBox;
 
 class UserAlreadyExists : public std::exception {
   std::string id_;
@@ -40,7 +40,7 @@ public:
   bool checkPassword(const std::string &password) const;
 
   bool sendMessage(const std::string& recipient_id, const std::string& msg);
-  void sendMessage(const User& recipient, const std::string& msg);
+  void sendMessage(User& recipient, const std::string& msg);
   size_t showInbox();
   void emptyInbox();
 
@@ -60,7 +60,7 @@ private:
   std::string hash_;
   std::string private_key_;
   std::string public_key_;
-  MailBox *inbox_;
+  MailBox inbox_;
   //MailBox outbox;
 
   static std::map<std::string, User*> userMap_;

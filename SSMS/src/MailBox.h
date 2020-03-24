@@ -9,7 +9,7 @@ namespace ssms {
 class User;
 
 struct Msg {
-  const std::string sender_id; /** user id of ther sender */
+  const std::string sender_id; /** user id of the sender */
   const std::string text;      /** text of the message */
   Msg(const std::string& sender_id, const std::string& text);
   bool operator==(const Msg& rhs) const;

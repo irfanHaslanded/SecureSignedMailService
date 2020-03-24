@@ -17,7 +17,7 @@ std::map<std::string, User*> User::userMap_{};
 
 // Member methods
 User::User(const std::string& id) : id_(id)
-                                  , inbox_(new MailBox(*this))
+                                  , inbox_(MailBox(*this))
 {
   if (!userMap_.emplace(id_, this).second)
   {
@@ -29,7 +29,6 @@ User::User(const std::string& id) : id_(id)
 User::~User()
 {
   userMap_.erase(id_);
-  delete inbox_;
 }
 
 void User::setName(const std::string& name)
@@ -89,14 +88,14 @@ bool User::sendMessage(const std::string& recipient_id, const std::string& msg)
   return true;
 }
 
-void User::sendMessage(const User& recipient, const std::string& msg)
+void User::sendMessage(User& recipient, const std::string& msg)
 {
-  recipient.inbox_->throwMsg(Msg(this->getId(), msg));
+  recipient.inbox_.throwMsg(Msg{this->getId(), msg});
 }
 
 size_t User::showInbox()
 {
-  const auto receivedMsgs = inbox_->getReceivedMsgs();
+  const auto receivedMsgs = inbox_.getReceivedMsgs();
   for (const auto &msg : receivedMsgs) {
     const auto user_search =
         userMap_.find(msg.sender_id); // sender might already be deleted or just
@@ -111,7 +110,7 @@ size_t User::showInbox()
 
 void User::emptyInbox()
 {
-  inbox_->clear();
+  inbox_.clear();
 }
 
 }
