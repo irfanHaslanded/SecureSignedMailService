@@ -10,61 +10,61 @@
 
 namespace ssms {
 
-  class MailBox;
+class MailBox;
 
-  class UserAlreadyExists : public std::exception {
-    std::string id_;
-    const char* what() const throw() override;
-  public:
-    UserAlreadyExists() = delete;
-    UserAlreadyExists(const std::string& id);
-    std::string getId();
-  };
+class UserAlreadyExists : public std::exception {
+  std::string id_;
+  const char* what() const throw() override;
+public:
+  UserAlreadyExists() = delete;
+  UserAlreadyExists(const std::string& id);
+  std::string getId();
+};
 
-  class User {
+class User {
 
-  public:
-    User(const std::string& id);
-    ~User();
+public:
+  User(const std::string& id);
+  ~User();
 
-    void setName(const std::string& name);
-    void setKeyPair();
-    const std::string& getId() const;
-    const std::string& getName() const;
-    std::string toString() const;
-    const std::string& getPrivateKey() const;
-    const std::string& getPublicKey() const;
+  const std::string& getId() const;
+  void setName(const std::string& name);
+  const std::string& getName() const;
+  std::string toString() const;
 
-    void setPassword(const std::string& password);
-    bool checkPassword(const std::string &password) const;
+  void setKeyPair();
+  const std::string& getPrivateKey() const;
+  const std::string& getPublicKey() const;
 
-    //enough to store IDs or usernames?
-    void addContact(std::string username);
-    void addContact(std::string username, std::string nickname);
-    void addContactById(int userId);
-    void addContactById(int userId, std::string nickname);
+  void setPassword(const std::string& password);
+  bool checkPassword(const std::string &password) const;
 
-    size_t showInbox();
-    void listMessagesFrom(User sender);
+  bool sendMessage(const std::string& recipient_id, const std::string& msg);
+  void sendMessage(const User& recipient, const std::string& msg);
+  size_t showInbox();
+  void emptyInbox();
 
-    void displayMessage(int msgId);
-    bool sendMessage(const std::string& recipient_id, const std::string& msg);
-    void sendMessage(const User& recipient, const std::string& msg);
-    void createMessage(std::string msg, User recipient);
-    void deleteMessage(int id);
-    void sendAll();
+  // void addContact(std::string username);
+  // void addContact(std::string username, std::string nickname);
+  // void addContactById(int userId);
+  // void addContactById(int userId, std::string nickname);
 
-  private:
-    std::string id_;
-    std::string name_;
-    std::string hash_;
-    std::string private_key_;
-    std::string public_key_;
-    MailBox *inbox_;
-    //MailBox outbox;
+  // void displayMessage(int msgId);
+  // void createMessage(std::string msg, User recipient);
+  // void deleteMessage(int id);
+  // void sendAll();
 
-    static std::map<std::string, User*> userMap_;
-  };
+private:
+  std::string id_;
+  std::string name_;
+  std::string hash_;
+  std::string private_key_;
+  std::string public_key_;
+  MailBox *inbox_;
+  //MailBox outbox;
+
+  static std::map<std::string, User*> userMap_;
+};
 
 }
 #endif //Include guard

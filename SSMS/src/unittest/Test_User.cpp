@@ -55,3 +55,14 @@ TEST(Test_User, SendMessage)
   ASSERT_TRUE(alice.sendMessage("bob", "Hello Bob! It's Alice"));
   ASSERT_EQ(bob.showInbox(), 1);
 }
+
+TEST(Test_User, EmptyInbox)
+{
+  User alice("alice");
+  User bob("bob");
+
+  alice.sendMessage("bob", "msg1");
+  alice.sendMessage("bob", "msg2");
+  bob.emptyInbox();
+  ASSERT_EQ(bob.showInbox(), 0);
+}

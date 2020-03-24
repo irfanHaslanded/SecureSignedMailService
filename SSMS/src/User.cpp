@@ -109,4 +109,9 @@ size_t User::showInbox()
   return receivedMsgs.size();
 }
 
+void User::emptyInbox()
+{
+  inbox_->clear();
+}
+
 }
