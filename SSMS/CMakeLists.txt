@@ -3,6 +3,9 @@ cmake_minimum_required (VERSION 2.6)
 # Use C++ 11
 set (CMAKE_CXX_STANDARD 11)
 
+# Add debug symbols
+set (CMAKE_BUILD_TYPE Debug)
+
 # Generate compile commands
 set (CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
