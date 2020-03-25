@@ -38,8 +38,8 @@ void User::setName(const std::string& name)
 
 void User::setKeyPair()
 {
-  private_key_ = "TODO: generate private key";
-  public_key_ = "TODO: generate public key";
+  private_key_ = "";
+  public_key_ = "";
 }
 
 const std::string& User::getId() const
