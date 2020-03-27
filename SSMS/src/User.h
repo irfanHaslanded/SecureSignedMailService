@@ -32,7 +32,6 @@ public:
   const std::string& getName() const;
   std::string toString() const;
 
-  void setKeyPair();
   const std::string& getPrivateKey() const;
   const std::string& getPublicKey() const;
 

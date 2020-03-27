@@ -15,6 +15,7 @@
 #include <openssl/err.h>
 #include <openssl/rand.h>
 #include <string>
+#include <memory>
 
 #define RSA_KEYLEN 2048
 
@@ -26,6 +27,7 @@
 #define KEY_CLIENT_PUB 2
 
 namespace ssms {
+
 class Crypto
 {
 public:
@@ -47,6 +49,9 @@ public:
   static int getLocalPublicKey(unsigned char **publicKey);
   static int getLocalPrivateKey(unsigned char **privateKey);
 
+  static void generateRsaKeypair(std::string& private_key, std::string& public_key);
+
+
 private:
   static EVP_PKEY *localKeypair;
   static int messageLength;
@@ -56,10 +61,11 @@ private:
   static EVP_CIPHER_CTX *rsaEncryptContext;
   static EVP_CIPHER_CTX *rsaDecryptContext;
 
-  static int init();
-  void free();
+  void freeContext();
   static int generateRsaKeypair(EVP_PKEY **keypair);
-  static  int bioToString(BIO *bio, unsigned char **string);
+  static std::string extractKey(EVP_PKEY* keypair, bool isPrivate);
+  static EVP_PKEY* compileKey(const std::string& key_str, bool isPrivate);
+  static int bioToString(BIO *bio, unsigned char **string);
 
 
 

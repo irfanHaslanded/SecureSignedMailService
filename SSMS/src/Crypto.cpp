@@ -8,7 +8,7 @@
 #include "Crypto.h"
 #include <crypt.h>
 
-
+#include <stdlib.h>
 
 namespace ssms {
 const int saltSize = 16;
@@ -25,8 +25,6 @@ static const std::string hashValidChars {
 
 std::string Crypto::encrypt(const std::string &message,
                             const std::string &publickey) {
-
-  init();//TODO: Better move this into a constructor
 
   // Encrypt the message with RSA
   // +1 on the string length argument because we want to encrypt the NUL terminator too
@@ -111,19 +109,7 @@ std::string Crypto::getSalt(const std::string &hash) {
   return salt;
 }
 
-int Crypto::init() {
-  //Initialize keys
-  localKeypair = NULL;
-
-  //IV -Initilization vector can be left to null for rsa cipher
-
-  // Generate RSA keys
-  generateRsaKeypair(&localKeypair);
-
-  return SUCCESS;
-}
-
-void Crypto::free(){
+void Crypto::freeContext(){
 
   EVP_CIPHER_CTX_free(rsaEncryptContext);
 
@@ -147,6 +133,62 @@ int Crypto::generateRsaKeypair(EVP_PKEY **keypair) {
 
   EVP_PKEY_CTX_free(context);
   return SUCCESS;
+}
+
+void Crypto::generateRsaKeypair(std::string& private_key, std::string& public_key)
+{
+  EVP_PKEY *keypair = NULL;
+  if (generateRsaKeypair(&keypair) != SUCCESS)
+  {
+    return;
+  }
+  private_key = extractKey(keypair, true);
+  public_key  = extractKey(keypair, false);
+  //std::cout << private_key << std::endl << public_key << std::endl;
+  free(keypair);
+}
+
+std::string Crypto::extractKey(EVP_PKEY* keypair, bool isPrivate)
+{
+  // create a place to dump the IO, in this case in memory
+  BIO *keyBIO = BIO_new(BIO_s_mem());
+  // dump key to IO
+  if (isPrivate) {
+    PEM_write_bio_PrivateKey(keyBIO, keypair, NULL, NULL, 0, 0, NULL);
+  } else {
+    PEM_write_bio_PUBKEY(keyBIO, keypair);
+  }
+  // get buffer length
+  int key_len = BIO_pending(keyBIO);
+  // create char reference of public key length
+  char *key_char = (char *) malloc(key_len+1);
+  // read the key from the buffer and put it in the char reference
+  BIO_read(keyBIO, key_char, key_len);
+  key_char[key_len] = '\0';
+  std::string extracted_key {key_char};
+  free(key_char);
+  free(keyBIO);
+  return extracted_key;
+}
+
+EVP_PKEY* Crypto::compileKey(const std::string& key_str, bool isPrivate)
+{
+  // write char array to BIO
+  BIO *rsaKeyBIO { BIO_new_mem_buf(key_str.c_str(), -1) };
+
+  // create a RSA object from key char array
+  RSA *(*read_key_from_bio)(BIO *, RSA **, pem_password_cb *, void *) =
+    isPrivate ? PEM_read_bio_RSAPrivateKey : PEM_read_bio_RSA_PUBKEY;
+  RSA *rsaKey { nullptr };
+  read_key_from_bio(rsaKeyBIO, &rsaKey, nullptr, nullptr);
+
+  // create key
+  EVP_PKEY *pkey { EVP_PKEY_new() };
+  EVP_PKEY_assign_RSA(pkey, rsaKey);
+  free(rsaKeyBIO);
+  free(rsaKey);
+
+  return pkey;
 }
 
 int Crypto::rsaEncrypt(const unsigned char *message, size_t messageLength, unsigned char **encryptedMessage, unsigned char **encryptedKey,
@@ -183,7 +225,7 @@ int Crypto::rsaEncrypt(const unsigned char *message, size_t messageLength, unsig
   /*Intializes a cipher context "rsaEncryptContext" for encryption with symmetric cipher type "EVP_aes_256_cbc()" using random secret key and IV. This secret key is encrypted using a public key.
   We can also encrypt with multiple pub keys*/
   /*EVP_aes_256_cbc() is the AES-256 cipher type. AES - Advanced encryption standard*/
-  if(!EVP_SealInit(rsaEncryptContext, EVP_aes_256_cbc(), encryptedKey, (int*)encryptedKeyLength, *iv, &localKeypair, 1)) {
+  if(!EVP_SealInit(rsaEncryptContext, EVP_aes_256_cbc(), encryptedKey, (int*)encryptedKeyLength, *iv, &localKeypair, 1)) { // TODO here we need the public key instead of localkeypair.
     return FAILURE;
   }
 

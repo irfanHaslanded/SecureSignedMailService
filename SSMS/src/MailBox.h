@@ -11,10 +11,15 @@ class User;
 struct Msg {
   const std::string sender_id; /** user id of the sender */
   const std::string text;      /** text of the message */
+#if 0
+  unsigned char ek[1024]; // TODO use proper size
+  int ek_len;
+  unsigned char iv[1024]; // TODO use proper size
+  int iv_len;
+#endif
   Msg(const std::string& sender_id, const std::string& text);
   bool operator==(const Msg& rhs) const;
 };
-
 
 /**
  * MailBox class. Each user has a MailBox, via which

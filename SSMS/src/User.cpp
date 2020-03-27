@@ -23,7 +23,7 @@ User::User(const std::string& id) : id_(id)
   {
     throw UserAlreadyExists(id_);
   }
-  this->setKeyPair();
+  Crypto::generateRsaKeypair(private_key_, public_key_);
 }
 
 User::~User()
@@ -34,12 +34,6 @@ User::~User()
 void User::setName(const std::string& name)
 {
   name_ = name;
-}
-
-void User::setKeyPair()
-{
-  private_key_ = "";
-  public_key_ = "";
 }
 
 const std::string& User::getId() const
