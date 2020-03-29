@@ -97,7 +97,7 @@ size_t User::showInbox()
     std::cout << (user_search != userMap_.end() && !user_search->second->getName().empty()
                       ? user_search->second->getName() + " <" + msg.sender_id + ">"
                       : msg.sender_id)
-              << ": " << Crypto::decrypt(msg.text, private_key_) << std::endl;
+              << ": " << msg.text << std::endl;
   }
   return receivedMsgs.size();
 }

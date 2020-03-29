@@ -28,23 +28,31 @@
 
 namespace ssms {
 
+struct CryptoEvpPars
+{
+  unsigned char encrypted_key[1024]; // EVP_PKEY_size(evp_public_key)
+
+  int encrypted_key_length;
+  unsigned char iv[EVP_MAX_IV_LENGTH];
+  CryptoEvpPars();
+};
+
 class Crypto
 {
 public:
-  static std::string encrypt(const std::string &message, const std::string &publickey);
-  static std::string decrypt(const std::string &message, const std::string &privatekey);
+  static bool encrypt(const std::string &plain_message,
+                      const std::string &public_key,
+                      std::string& encrypted_message,
+                      CryptoEvpPars& evp_pars);
+  static bool decrypt(const std::string &encrypted_message,
+                      const std::string &private_key,
+                      std::string& decrypted_message,
+                      const CryptoEvpPars& evp_pars);
   static bool validatePassword(const std::string &hash, const std::string &password);
   static std::string genHash(const std::string &salt, const std::string &rawPwd);
   static std::string passTheSalt();
   static std::string getSalt(const std::string &hash);
   static std::string genPassword(const std::string &password);
-
-  /*Functions for rsa encryption and decryption*/
-  static int rsaEncrypt(const unsigned char *message, size_t messageLength, unsigned char **encryptedMessage, unsigned char **encryptedKey,
-      size_t *encryptedKeyLength, unsigned char **iv, size_t *ivLength);
-
-  static int rsaDecrypt(const unsigned char *encryptedMessage, size_t encryptedMessageLength,const unsigned char *encryptedKey, size_t encryptedKeyLength,
-      unsigned char *iv, size_t ivLength, unsigned char **decryptedMessage);
 
   static int getLocalPublicKey(unsigned char **publicKey);
   static int getLocalPrivateKey(unsigned char **privateKey);
@@ -61,7 +69,6 @@ private:
   static EVP_CIPHER_CTX *rsaEncryptContext;
   static EVP_CIPHER_CTX *rsaDecryptContext;
 
-  void freeContext();
   static int generateRsaKeypair(EVP_PKEY **keypair);
   static std::string extractKey(EVP_PKEY* keypair, bool isPrivate);
   static EVP_PKEY* compileKey(const std::string& key_str, bool isPrivate);

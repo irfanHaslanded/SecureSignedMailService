@@ -11,73 +11,30 @@
 #include <stdlib.h>
 
 namespace ssms {
+
+CryptoEvpPars::CryptoEvpPars() : encrypted_key_length(sizeof(encrypted_key)) {}
+
 const int saltSize = 16;
 const int saltIdSize = 3;  // eaxmple "$6$"
 
-EVP_PKEY* Crypto::localKeypair;
-EVP_CIPHER_CTX* Crypto::rsaEncryptContext;
-EVP_CIPHER_CTX* Crypto::rsaDecryptContext;
-int Crypto::messageLength;
-unsigned char* Crypto::encryptedKey;
-size_t Crypto::encryptedKeyLength;
 static const std::string hashValidChars {
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./"};
 
-std::string Crypto::encrypt(const std::string &message,
-                            const std::string &publickey) {
-
-  // Encrypt the message with RSA
-  // +1 on the string length argument because we want to encrypt the NUL terminator too
-  unsigned char *encryptedMessage = NULL;
-  unsigned char *iv;
-  size_t ivLength;
-
-  //TODO: We have an empty public key. Need to use the generated one from init().
-  //unsigned char *publickey_generated;
-  //getLocalPublicKey((unsigned char**)publickey_generated);
-
-  int encryptedMessageLength = rsaEncrypt((const unsigned char*)message.c_str(), message.size()+1,
-    &encryptedMessage, &encryptedKey, &encryptedKeyLength, &iv, &ivLength);
-
-  messageLength = encryptedMessageLength;
-  std::string s((char*)encryptedMessage);
-  return s;
-}
-
-std::string Crypto::decrypt(const std::string &message,
-                            const std::string &privatekey) {
-
-  unsigned char *decryptedMessage = NULL;
-  unsigned char *iv;
-  size_t privatekeyLength = sizeof(privatekey);
-  size_t ivLength;
-
-  //TODO: We have an empty private key. Need to use the generated one in init().
-  //unsigned char *privatekey_generated;
-  //getLocalPrivateKey((unsigned char**)privatekeys);
-
-  int decryptedMessageLength = rsaDecrypt((const unsigned char*)message.c_str(), messageLength,
-  (const unsigned char*)&encryptedKey, encryptedKeyLength, iv, ivLength, (unsigned char**)&decryptedMessage);
-
-  std::string s((char*)decryptedMessage);
-  return s;
-}
-
 bool Crypto::validatePassword(const std::string &hash,
-                              const std::string &password) {
+                              const std::string &password)
+{
   return hash == genHash(Crypto::getSalt(hash), password);
-
 }
 
-std::string Crypto::genPassword(const std::string &password) {
-
+std::string Crypto::genPassword(const std::string &password)
+{
   std::string salt = passTheSalt();
   std::cout << salt << std::endl; // for UT debugging purposes
   return genHash(salt, password);
-
 }
 
- std::string Crypto::passTheSalt() {
+std::string Crypto::passTheSalt()
+{
   int j = 0;
   
   unsigned char saltData[saltSize] = "";
@@ -103,20 +60,15 @@ std::string Crypto::genHash(const std::string &salt,
   return s;
 }
 
-std::string Crypto::getSalt(const std::string &hash) {
+std::string Crypto::getSalt(const std::string &hash)
+{
   std::string salt(hash.substr(0, saltSize + saltIdSize + 1));
   std::cout << "salt is  : " + salt << std::endl; // for UT debugging purposes
   return salt;
 }
 
-void Crypto::freeContext(){
-
-  EVP_CIPHER_CTX_free(rsaEncryptContext);
-
-  EVP_CIPHER_CTX_free(rsaDecryptContext);
-}
-
-int Crypto::generateRsaKeypair(EVP_PKEY **keypair) {
+int Crypto::generateRsaKeypair(EVP_PKEY **keypair)
+{
   EVP_PKEY_CTX *context = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, NULL);
 
   if(EVP_PKEY_keygen_init(context) <= 0) {
@@ -144,7 +96,6 @@ void Crypto::generateRsaKeypair(std::string& private_key, std::string& public_ke
   }
   private_key = extractKey(keypair, true);
   public_key  = extractKey(keypair, false);
-  //std::cout << private_key << std::endl << public_key << std::endl;
   free(keypair);
 }
 
@@ -186,138 +137,129 @@ EVP_PKEY* Crypto::compileKey(const std::string& key_str, bool isPrivate)
   EVP_PKEY *pkey { EVP_PKEY_new() };
   EVP_PKEY_assign_RSA(pkey, rsaKey);
   free(rsaKeyBIO);
-  free(rsaKey);
+  //free(rsaKey);
 
   return pkey;
 }
 
-int Crypto::rsaEncrypt(const unsigned char *message, size_t messageLength, unsigned char **encryptedMessage, unsigned char **encryptedKey,
-  size_t *encryptedKeyLength, unsigned char **iv, size_t *ivLength) {
-
-  // Allocate memory for everything
-  size_t encryptedMessageLength = 0;
-  size_t blockLength = 0;
-
+bool Crypto::encrypt(const std::string& plain_message,
+                     const std::string& public_key,
+                     std::string& encrypted_message,
+                     CryptoEvpPars& evp_pars)
+{
   /*TODO:Extracting public key from keypair generated in init and convert the key into EVP_PKEY** format and then replace localKeypair in EVP_SealInit() with that.---*/
+  EVP_PKEY* evp_public_key { compileKey(public_key, false) };
 
-  // Initalize contexts
-  rsaEncryptContext = EVP_CIPHER_CTX_new();
+  // Initalize context
+  EVP_CIPHER_CTX* rsa_encrypt_context { EVP_CIPHER_CTX_new() };
+  if(rsa_encrypt_context == nullptr) {
+    return false;
+  }
 
-  // Check if any of the contexts initializations failed
-  if(rsaEncryptContext == NULL) {
+  unsigned char *encrypted_key = evp_pars.encrypted_key;
+  /* Intializes a cipher context "rsaEncryptContext" for encryption with symmetric cipher type "EVP_aes_256_cbc()" using random secret key and IV. This secret key is encrypted using a public key.
+     We can also encrypt with multiple pub keys */
+  /* EVP_aes_256_cbc() is the AES-256 cipher type. AES - Advanced encryption standard */
+  if(!EVP_SealInit(rsa_encrypt_context,
+                   EVP_aes_256_cbc(),
+                   &encrypted_key,
+                   &evp_pars.encrypted_key_length,
+                   evp_pars.iv,
+                   &evp_public_key,
+                   1))
+  {
     return FAILURE;
   }
 
-  *encryptedKey = (unsigned char*)malloc(EVP_PKEY_size(localKeypair));
-  *iv = (unsigned char*)malloc(EVP_MAX_IV_LENGTH);/*Make sure to add more info about IV*/
-  *ivLength = EVP_MAX_IV_LENGTH;
-
-  if(*encryptedKey == NULL || *iv == NULL) {
-    return FAILURE;
+  int encrypted_message_length = 0;
+  unsigned char* encrypted_message_buf = (unsigned char*)malloc(plain_message.size() + EVP_MAX_IV_LENGTH + 1);
+  if (encrypted_message_buf == NULL) {
+    return false;
   }
 
-  *encryptedMessage = (unsigned char*)malloc(messageLength + EVP_MAX_IV_LENGTH);
-  if(encryptedMessage == NULL) {
-    return FAILURE;
+  /* encrypts the given number of bytes from plain_message and writes the encrypted version to *encrypted_message_buf */
+  /* In our case we are encrypting only a single message, we can always call this multiple times and do line by line seperate encryption if needed. */
+  if(!EVP_SealUpdate(rsa_encrypt_context,
+                     encrypted_message_buf,
+                     &encrypted_message_length,
+                     (const unsigned char*)plain_message.c_str(),
+                     (int)plain_message.size()))
+  {
+    return false;
   }
 
-  // Encrypt it!
-  /*Intializes a cipher context "rsaEncryptContext" for encryption with symmetric cipher type "EVP_aes_256_cbc()" using random secret key and IV. This secret key is encrypted using a public key.
-  We can also encrypt with multiple pub keys*/
-  /*EVP_aes_256_cbc() is the AES-256 cipher type. AES - Advanced encryption standard*/
-  if(!EVP_SealInit(rsaEncryptContext, EVP_aes_256_cbc(), encryptedKey, (int*)encryptedKeyLength, *iv, &localKeypair, 1)) { // TODO here we need the public key instead of localkeypair.
-    return FAILURE;
+  /* Finalizing encryption */
+  /* This will pad extra space in buffer to fill up last block. */
+  int padding_length = 0;
+  if(!EVP_SealFinal(rsa_encrypt_context,
+                    encrypted_message_buf + encrypted_message_length,
+                    &padding_length))
+  {
+    return false;
   }
 
-  /*encrypts "messageLength" bytes from the "message" in and writes the encrypted version to "*encryptedMessage + encryptedMessageLength" of size "(int*)&blockLength"*/
-  /*In our case we are encrypting only a single message, we can always call this multiple times and do line by line seperate encryption if needed.*/
-  /*The update function returns the number of bytes that are encrypted.*/
-  if(!EVP_SealUpdate(rsaEncryptContext, *encryptedMessage + encryptedMessageLength, (int*)&blockLength, (const unsigned char*)message, (int)messageLength)) {
-    return FAILURE;
-  }
-  encryptedMessageLength += blockLength;
-
-  /*Finalizing encryption*/
-  /*This will pad extra space in buffer to fill up last block.*/
-  if(!EVP_SealFinal(rsaEncryptContext, *encryptedMessage + encryptedMessageLength, (int*)&blockLength)) {
-    return FAILURE;
-  }
-  encryptedMessageLength += blockLength;
-
-  /*Returning the number of bytes encrypted. It is a binary string.*/
-  return (int)encryptedMessageLength;
+  EVP_CIPHER_CTX_free(rsa_encrypt_context);
+  free(evp_public_key);
+  encrypted_message_buf[encrypted_message_length + padding_length] = '\0';
+  encrypted_message = std::string { (char *)encrypted_message_buf }; // TODO we need a real bin->ascii conversion
+  free(encrypted_message_buf);
+  return true;
 }
 
-int Crypto::rsaDecrypt(const unsigned char *encryptedMessage, size_t encryptedMessageLength, const unsigned char *encryptedKey,
-  size_t encryptedKeyLength, unsigned char *iv, size_t ivLength, unsigned char **decryptedMessage) {
-
-  //Allocate memory for everything
-  size_t decryptedMessageLength = 0;
-  size_t blockLength = 0;
-
-  *decryptedMessage = (unsigned char*)malloc(encryptedMessageLength + ivLength);
-  if(*decryptedMessage == NULL) {
-    return FAILURE;
+bool Crypto::decrypt(const std::string& encrypted_message,
+                     const std::string& private_key,
+                     std::string& decrypted_message,
+                     const CryptoEvpPars& evp_pars)
+{
+  // Initalize context
+  EVP_CIPHER_CTX* rsa_decrypt_context { EVP_CIPHER_CTX_new() };
+  if(rsa_decrypt_context == NULL) {
+    return false;
   }
 
-  // Initalize contexts
-  rsaDecryptContext = EVP_CIPHER_CTX_new();
-
-  // Check if any of the contexts initializations failed
-  if(rsaDecryptContext == NULL) {
-    return FAILURE;
-  }
-
-  /*TODO:Extracting private key from keypair generated in init and convert the key into EVP_PKEY** format. Then replace localKeypair in EVP_OpenInit() with that.---*/
+  EVP_PKEY* evp_private_key { compileKey(private_key, true) };
 
   // Decrypt it!
   /*Initializes a cipher context "rsaDecryptContext" for decryption with cipher type "EVP_aes_256_cbc()". It decrypts the encrypted symmetric key of length "encryptedKeyLength" bytes passed in 
   as "encryptedKey" using the private key*/
-  if(!EVP_OpenInit(rsaDecryptContext, EVP_aes_256_cbc(), encryptedKey, encryptedKeyLength, iv, localKeypair)) {
-    return FAILURE;
+  if(!EVP_OpenInit(rsa_decrypt_context,
+                   EVP_aes_256_cbc(),
+                   evp_pars.encrypted_key,
+                   evp_pars.encrypted_key_length,
+                   evp_pars.iv,
+                   evp_private_key))
+  {
+    return false;
   }
 
-  /*You know what it does :p*/
-  if(!EVP_OpenUpdate(rsaDecryptContext, (unsigned char*)*decryptedMessage + decryptedMessageLength, (int*)&blockLength, encryptedMessage, (int)encryptedMessageLength)) {
-    return FAILURE;
-  }
-  decryptedMessageLength += blockLength;
-
-  if(!EVP_OpenFinal(rsaDecryptContext, (unsigned char*)*decryptedMessage + decryptedMessageLength, (int*)&blockLength)) {
-    return FAILURE;
+  int decrypted_message_length = 0;
+  unsigned char *decrypted_message_buf = (unsigned char *)malloc(encrypted_message.size() + EVP_MAX_IV_LENGTH + 1);
+  if (decrypted_message_buf == nullptr) {
+    return false;
   }
 
-  decryptedMessageLength += blockLength;
-  return (int)decryptedMessageLength;
-}
-
-int Crypto::getLocalPublicKey(unsigned char **publicKey) {
-  BIO *bio = BIO_new(BIO_s_mem());
-  PEM_write_bio_PUBKEY(bio, localKeypair);
-  return bioToString(bio, publicKey);
-}
-
-int Crypto::getLocalPrivateKey(unsigned char **privateKey) {
-  BIO *bio = BIO_new(BIO_s_mem());
-  PEM_write_bio_PrivateKey(bio, localKeypair, NULL, NULL, 0, 0, NULL);
-  return bioToString(bio, privateKey);
-}
-
-int Crypto::bioToString(BIO *bio, unsigned char **string) {
-  size_t bioLength = BIO_pending(bio);
-  *string = (unsigned char*)malloc(bioLength + 1);
-
-  if(string == NULL) {
-    return FAILURE;
+  /* You know what it does :p */
+  if(!EVP_OpenUpdate(rsa_decrypt_context,
+                     decrypted_message_buf,
+                     &decrypted_message_length,
+                     (const unsigned char *)encrypted_message.c_str(), // TODO we need an ascii->bin conversion
+                     (int)encrypted_message.size())) {
+    return false;
   }
 
-  BIO_read(bio, *string, bioLength);
+  int padding_length = 0;
+  if(!EVP_OpenFinal(rsa_decrypt_context,
+                    decrypted_message_buf + decrypted_message_length,
+                    &padding_length))
+  {
+    return false;
+  }
 
-  // Insert the NUL terminator
-  (*string)[bioLength] = '\0';
-
-  BIO_free_all(bio);
-
-  return (int)bioLength;
+  EVP_CIPHER_CTX_free(rsa_decrypt_context);
+  free(evp_private_key);
+  decrypted_message_buf[decrypted_message_length + padding_length] = '\0';
+  decrypted_message = std::string { (const char*)decrypted_message_buf };
+  free(decrypted_message_buf);
+  return true;
 }
 } 
