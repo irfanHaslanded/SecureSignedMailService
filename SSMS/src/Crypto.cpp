@@ -6,6 +6,8 @@
  */
 
 #include "Crypto.h"
+#include "Base64.h"
+
 #include <crypt.h>
 
 #include <stdlib.h>
@@ -168,7 +170,7 @@ bool Crypto::encrypt(const std::string& plain_message,
                    &evp_public_key,
                    1))
   {
-    return FAILURE;
+    return false;
   }
 
   int encrypted_message_length = 0;
@@ -200,8 +202,9 @@ bool Crypto::encrypt(const std::string& plain_message,
 
   EVP_CIPHER_CTX_free(rsa_encrypt_context);
   free(evp_public_key);
-  encrypted_message_buf[encrypted_message_length + padding_length] = '\0';
-  encrypted_message = std::string { (char *)encrypted_message_buf }; // TODO we need a real bin->ascii conversion
+
+  encrypted_message_length += padding_length;
+  encrypted_message = Base64::encode(encrypted_message_buf, (size_t)encrypted_message_length);
   free(encrypted_message_buf);
   return true;
 }
@@ -238,12 +241,14 @@ bool Crypto::decrypt(const std::string& encrypted_message,
     return false;
   }
 
+  std::vector<unsigned char> encrypted_message_original { Base64::decode(encrypted_message) };
+
   /* You know what it does :p */
   if(!EVP_OpenUpdate(rsa_decrypt_context,
                      decrypted_message_buf,
                      &decrypted_message_length,
-                     (const unsigned char *)encrypted_message.c_str(), // TODO we need an ascii->bin conversion
-                     (int)encrypted_message.size())) {
+                     encrypted_message_original.data(),
+                     (int)encrypted_message_original.size())) {
     return false;
   }
 

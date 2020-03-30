@@ -31,7 +31,6 @@ namespace ssms {
 struct CryptoEvpPars
 {
   unsigned char encrypted_key[1024]; // EVP_PKEY_size(evp_public_key)
-
   int encrypted_key_length;
   unsigned char iv[EVP_MAX_IV_LENGTH];
   CryptoEvpPars();

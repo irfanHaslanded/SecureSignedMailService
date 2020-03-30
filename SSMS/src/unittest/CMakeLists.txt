@@ -21,12 +21,23 @@ add_test(Test_Cli Test_Cli)
 ### Crypto ###################################################################
 add_executable(Test_Crypto
     Test_Crypto.cpp
+    ../Base64.cpp
     ../Crypto.cpp
     )
 target_link_libraries(Test_Crypto
     ${GTEST_BOTH_LIBRARIES} pthread crypto crypt
     )
 add_test(Test_Crypto Test_Crypto)
+
+### Base64 ###################################################################
+add_executable(Test_Base64
+    Test_Base64.cpp
+    ../Base64.cpp
+    )
+target_link_libraries(Test_Base64
+    ${GTEST_BOTH_LIBRARIES} pthread crypto crypt
+    )
+add_test(Test_Base64 Test_Base64)
 
 ### User #####################################################################
 add_executable(Test_User
@@ -35,6 +46,7 @@ add_executable(Test_User
     ../MailBox.cpp
     #mocks/MailBox_mock.cpp
     ../Crypto.cpp
+    ../Base64.cpp
     #mocks/Crypto_mock.cpp
     )
 target_link_libraries(Test_User
@@ -49,6 +61,7 @@ add_executable(Test_MailBox
     ../User.cpp
     #mocks/User_mock.cpp
     ../Crypto.cpp
+    ../Base64.cpp
     #mocks/Crypto_mock.cpp
     )
 target_link_libraries(Test_MailBox
@@ -59,6 +72,7 @@ add_test(Test_MailBox Test_MailBox)
 ##############################################################################
 add_custom_target(test DEPENDS
     Test_Cli
+    Test_Base64
     Test_Crypto
     Test_User
     Test_MailBox
