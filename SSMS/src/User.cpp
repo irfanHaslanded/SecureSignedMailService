@@ -23,7 +23,10 @@ User::User(const std::string& id) : id_(id)
   {
     throw UserAlreadyExists(id_);
   }
-  Crypto::generateRsaKeypair(private_key_, public_key_);
+  if (!Crypto::generateRsaKeypair(private_key_, public_key_))
+  {
+    throw std::runtime_error("Key-pair generation failed");
+  }
 }
 
 User::~User()

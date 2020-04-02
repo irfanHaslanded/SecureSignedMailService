@@ -28,7 +28,6 @@ void MailBox::throwMsg(const Msg& plain_msg)
   {
     encrypted_msg.sender_id = plain_msg.sender_id;
     mailbox_.push_back(encrypted_msg);
-    std::cout << encrypted_msg.sender_id << ": " << encrypted_msg.text << std::endl;
   }
 }
 

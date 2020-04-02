@@ -13,6 +13,8 @@ public:
   static std::string encode(const unsigned char* binary, size_t size);
   static std::vector<unsigned char> decode(const std::string& base64);
 
+private:
+  static const int BIO_flags;
 };
 
 }

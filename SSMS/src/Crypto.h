@@ -17,16 +17,15 @@
 #include <string>
 #include <memory>
 
-#define RSA_KEYLEN 2048
-
-#define SUCCESS 0
-#define FAILURE -1
-
-#define KEY_SERVER_PRI 0
-#define KEY_SERVER_PUB 1
-#define KEY_CLIENT_PUB 2
-
 namespace ssms {
+
+enum class KeyAccess { PRIVATE, PUBLIC };
+
+struct EvpPkeyFree {
+  void operator()(EVP_PKEY* evp_pkey) { EVP_PKEY_free(evp_pkey); }
+};
+
+using EvpPkeyUniquePtr = std::unique_ptr<EVP_PKEY, EvpPkeyFree>;
 
 struct CryptoEvpPars
 {
@@ -52,30 +51,19 @@ public:
   static std::string passTheSalt();
   static std::string getSalt(const std::string &hash);
   static std::string genPassword(const std::string &password);
-
-  static int getLocalPublicKey(unsigned char **publicKey);
-  static int getLocalPrivateKey(unsigned char **privateKey);
-
-  static void generateRsaKeypair(std::string& private_key, std::string& public_key);
-
+  static bool generateRsaKeypair(std::string& private_key, std::string& public_key);
 
 private:
-  static EVP_PKEY *localKeypair;
-  static int messageLength;
-  static unsigned char *encryptedKey;
-  static size_t encryptedKeyLength;
-
-  static EVP_CIPHER_CTX *rsaEncryptContext;
-  static EVP_CIPHER_CTX *rsaDecryptContext;
-
-  static int generateRsaKeypair(EVP_PKEY **keypair);
-  static std::string extractKey(EVP_PKEY* keypair, bool isPrivate);
-  static EVP_PKEY* compileKey(const std::string& key_str, bool isPrivate);
+  static bool generateRsaKeypair(EVP_PKEY **keypair);
+  static std::string extractKey(EVP_PKEY* keypair, KeyAccess key_access);
+  static EvpPkeyUniquePtr compileKey(const std::string& key_str, KeyAccess key_access);
   static int bioToString(BIO *bio, unsigned char **string);
 
-
-
+private:
+  static const int RSA_KEYLEN;
+  static const int saltSize;
+  static const int saltIdSize;
 };
-}; // namespace ssms
+} // namespace ssms
 
 #endif
