@@ -23,7 +23,10 @@ User::User(const std::string& id) : id_(id)
   {
     throw UserAlreadyExists(id_);
   }
-  this->setKeyPair();
+  if (!Crypto::generateRsaKeypair(private_key_, public_key_))
+  {
+    throw std::runtime_error("Key-pair generation failed");
+  }
 }
 
 User::~User()
@@ -34,12 +37,6 @@ User::~User()
 void User::setName(const std::string& name)
 {
   name_ = name;
-}
-
-void User::setKeyPair()
-{
-  private_key_ = "TODO: generate private key";
-  public_key_ = "TODO: generate public key";
 }
 
 const std::string& User::getId() const
@@ -103,7 +100,7 @@ size_t User::showInbox()
     std::cout << (user_search != userMap_.end() && !user_search->second->getName().empty()
                       ? user_search->second->getName() + " <" + msg.sender_id + ">"
                       : msg.sender_id)
-              << ": " << Crypto::decrypt(msg.text, private_key_) << std::endl;
+              << ": " << msg.text << std::endl;
   }
   return receivedMsgs.size();
 }

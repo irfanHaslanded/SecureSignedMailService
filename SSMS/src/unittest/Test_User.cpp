@@ -53,7 +53,8 @@ TEST(Test_User, SendMessage)
   ASSERT_EQ(bob.showInbox(), 0);
   ASSERT_EQ(alice.showInbox(), 0);
   ASSERT_TRUE(alice.sendMessage("bob", "Hello Bob! It's Alice"));
-  ASSERT_EQ(bob.showInbox(), 1);
+  ASSERT_TRUE(alice.sendMessage("bob", "Hello Bob! It's Alice again"));
+  ASSERT_EQ(bob.showInbox(), 2);
 }
 
 TEST(Test_User, EmptyInbox)

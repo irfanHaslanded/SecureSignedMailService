@@ -1,6 +1,9 @@
 #ifndef SSMS_MAILBOX_H_
 #define SSMS_MAILBOX_H_
 
+#include "Crypto.h"
+
+#include <openssl/evp.h>
 #include <string>
 #include <list>
 
@@ -9,12 +12,13 @@ namespace ssms {
 class User;
 
 struct Msg {
-  const std::string sender_id; /** user id of the sender */
-  const std::string text;      /** text of the message */
-  Msg(const std::string& sender_id, const std::string& text);
+  std::string sender_id; /** user id of the sender */
+  std::string text;      /** text of the message */
+  CryptoEvpPars evp_pars;
+  Msg();
+  Msg(const std::string& sender_id , const std::string& text);
   bool operator==(const Msg& rhs) const;
 };
-
 
 /**
  * MailBox class. Each user has a MailBox, via which
@@ -33,9 +37,9 @@ public:
 
   /**
    * Throw message encrypted to the mailbox
-   * @param msg Message containing sender id and text
+   * @param plain_msg Message containing sender id and text
    */
-  void throwMsg(const Msg& msg);
+  void throwMsg(const Msg& plain_msg);
 
   /**
    * Get all the received messages

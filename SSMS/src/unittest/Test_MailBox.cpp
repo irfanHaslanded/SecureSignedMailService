@@ -43,11 +43,14 @@ TEST(Test_MailBox, GetReceivedMsgs)
   User b {"bob"};
   MailBox mb {b};
 
-  const Msg msg {a.getId(), "Hello!"};
+  const Msg msg {a.getId(), " Hello!"};
   mb.throwMsg(msg);
   const auto receivedMsgs = mb.getReceivedMsgs();
   ASSERT_NE(receivedMsgs.begin(), receivedMsgs.end());
   ASSERT_EQ(*receivedMsgs.begin(), msg);
+  Msg it = *receivedMsgs.begin();
+  std::cout << "Original text:  '" << msg.text << "'" << std::endl;
+  std::cout << "Decrypted text: '" << it.text  << "'" << std::endl;
 }
 
 TEST(Test_MailBox, Clear)

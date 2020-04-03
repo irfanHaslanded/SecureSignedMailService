@@ -5,6 +5,7 @@
 namespace ssms {
 
 // Message
+Msg::Msg() {}
 Msg::Msg(const std::string& sender_id , const std::string& text)
   : sender_id(sender_id) , text(text) {}
 bool Msg::operator==(const Msg& rhs) const
@@ -17,19 +18,33 @@ bool Msg::operator==(const Msg& rhs) const
 
 MailBox::MailBox(const User& owner) : owner_{owner} {};
 
-void MailBox::throwMsg(const Msg& msg)
+void MailBox::throwMsg(const Msg& plain_msg)
 {
-  mailbox_.emplace_back(
-    Msg(msg.sender_id, Crypto::encrypt(msg.text, owner_.getPublicKey())));
+  Msg encrypted_msg {};
+  if (Crypto::encrypt(plain_msg.text,
+                      owner_.getPublicKey(),
+                      encrypted_msg.text,
+                      encrypted_msg.evp_pars))
+  {
+    encrypted_msg.sender_id = plain_msg.sender_id;
+    mailbox_.push_back(encrypted_msg);
+  }
 }
 
 std::list<Msg> MailBox::getReceivedMsgs() const
 {
   std::list<Msg> decrypted_received_msgs;
-  for (const auto &msg : mailbox_)
+  Msg decrypted_msg {};
+  for (const auto& encrypted_msg : mailbox_)
   {
-    decrypted_received_msgs.emplace_back(
-      Msg(msg.sender_id, Crypto::decrypt(msg.text, owner_.getPrivateKey())));
+    if (Crypto::decrypt(encrypted_msg.text,
+                        owner_.getPrivateKey(),
+                        decrypted_msg.text,
+                        encrypted_msg.evp_pars))
+    {
+      decrypted_msg.sender_id = encrypted_msg.sender_id;
+      decrypted_received_msgs.push_back(decrypted_msg);
+    }
   }
   return decrypted_received_msgs;
 }
