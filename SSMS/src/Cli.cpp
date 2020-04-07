@@ -5,16 +5,18 @@
 #include <termios.h>
 
 #include "Cli.h"
-#include "User.h"
+
 namespace ssms {
 
 static Cli *cli = NULL;
 
 void Cli::start(void) {
+
   cli = new Cli();
+  cli->setMenuNotLoggedInUser();
+
   while(true) {
     cli->processIo();
-
   }
 }
 
@@ -25,36 +27,28 @@ Cli::~Cli() {
 }
 
 void Cli::processIo() {
-  Cli::printHelpText();
 
+  std::cout << Cli::getPrompt();
+  char input[100];
+
+  std::cin.getline(input, sizeof(input));
+
+  interpretInput(input);
 }
 
 void Cli::printHelpText() {
   // print help text
 	int input=0;
-	std::cout<<"Please select your option:"<<std::endl;
-	std::cout<<"1- Create User"<<std::endl;
-	std::cout<<"2- Delete User"<<std::endl;
-	std::cout<<"3- Log In "<<std::endl;
-    std::cin>>input;
+  std::cout << "Available commands:" <<std::endl;
+  std::cout << "------------------" <<std::endl;
+  std::cout <<"Help" << std::endl;
+  std::cout <<"Create User" << std::endl;
+  std::cout <<"Delete User" << std::endl;
+  std::cout <<"Log in" << std::endl;
+  std::cout <<"Exit" << std::endl;
 
-    switch(input)
-    {
-      case 1:
-        Cli::createUser();
-        break;
-      case 2:
-        Cli::deleteUser();
-        break;
-      case 3:
-        Cli::logIn();
-        break;
-      default:
-        std::cout<<"Invalid option.";
-        break;
-    }
+  }
 
-}
 
 std::string Cli::getPrompt() {
   std::string tmpPrompt;
@@ -90,27 +84,37 @@ bool Cli::deleteUser() {
 
 bool Cli::logIn()
 {
+  //First
+  //check if ANY user exist -> if not, tell the user to create one.
+  /*
+      if(no users)
+      cout<< No existing users, create one first!
+  */
+
 	std::string input;
-	// Just to take input from user
+
 	std::cout<<"Enter your username:"<< std::endl;
 	std::cin>>input;
-	try
-	{
-			User currentUser(input);
-	}
-	catch(UserAlreadyExists& e)
-	{
-		std::cout<<"User already exists"<<std::endl;
-	}
-//	if()
-//	{
-//		cli->loggedInUser = &tmpUser;
-//    	  std::cout<< Cli::getPrompt();
-//
-//	}
 
-	return true;
+
+
+  // Here we should:
+  // check if user name exist in the list of users ; userMap_.emplace(input, cli).second
+  // or with userMap.at()
+
+  // if so require password,
+  // then set current user to that user.
+
+  // As for now make a dummy User and have it as active user.
+
+  std::string dummyUserName = "banQuo";
+  static User tmpUser(dummyUserName);
+  //TODO: should point at the user in the user map.
+  cli->loggedInUser = &tmpUser;
+
+  return true;
 }
+
 std::string Cli::inputPassword(const char *prompt)
 {
   const char BACKSPACE=127;
@@ -161,4 +165,32 @@ int Cli::getch()
 	return ch;
 }
 
+ void Cli::interpretInput(std::string input)
+ {
+
+  if ( cli->menuItems.find(input) == cli->menuItems.end() ) {
+      std::cout<< input << std::endl;
+      std::cout << "Invalid input. type help or ? for a list of commands." << std::endl;
+      return;
+  } else {
+    cli->menuItems.at(input)();
+  }
+
+ };
+
+// TODO: description, nicer way of handling similar inputs (h, help etc).
+// other set of inputs for logged in and not logged in users, maybe separate class
+// fix exit function
+  void Cli::setMenuNotLoggedInUser()
+  {
+    menu_map initMap;
+    cli->menuItems = initMap;
+    cli->menuItems.emplace("Help", std::bind(&Cli::printHelpText, cli));
+    cli->menuItems.emplace("help", std::bind(&Cli::printHelpText, cli));
+    cli->menuItems.emplace("h", std::bind(&Cli::printHelpText, cli));
+    cli->menuItems.emplace("Create User", std::bind(&Cli::createUser, cli));
+    cli->menuItems.emplace("Delete User", std::bind(&Cli::deleteUser, cli));
+    cli->menuItems.emplace("Log in", std::bind(&Cli::logIn, cli));
+    cli->menuItems.emplace("Exit", std::bind(&Cli::logIn, cli));
+  };
 }
