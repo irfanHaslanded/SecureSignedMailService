@@ -22,7 +22,6 @@ User::User(const std::string& id) : id_(id)
 {
   if (!userMap_.emplace(id_, this).second)
   {
-	std::cout<<"Hello master"<<std::endl;
     throw UserAlreadyExists(id_);
 
   }

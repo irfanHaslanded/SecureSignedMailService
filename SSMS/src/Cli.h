@@ -20,6 +20,8 @@ class Cli
     bool createUser();
     bool deleteUser();
     bool logIn(); // remove
+    int getch();
+    std::string inputPassword(const char *prompt);
     bool userLoggedIn;
     std::string propmt;
     std::map <std::string, User> users;
