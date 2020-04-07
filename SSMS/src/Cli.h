@@ -10,16 +10,18 @@ class Cli
 {
   public:
     static void start(void);
-
+    std::string getPrompt();
+    std::string setPrompt();
   private:
     Cli();
     virtual ~Cli();
     void processIo();
     void printHelpText();
-    std::string getPrompt();
     bool createUser(User &user);
     bool deleteUser(User &user);
-    bool logIn(std::string username, std::string password);
+    bool logIn(std::string username, std::string password); // remove
+    bool userLoggedIn;
+    std::string propmt;
     std::map <std::string, User> users;
     User *loggedInUser;
 };

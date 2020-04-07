@@ -17,6 +17,7 @@ std::map<std::string, User*> User::userMap_{};
 
 // Member methods
 User::User(const std::string& id) : id_(id)
+                                  , name_ (id)
                                   , inbox_(MailBox(*this))
 {
   if (!userMap_.emplace(id_, this).second)
