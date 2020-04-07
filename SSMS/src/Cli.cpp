@@ -14,6 +14,7 @@ void Cli::start(void) {
 
   cli = new Cli();
   cli->setMenuNotLoggedInUser();
+  cli->printWelcomeScreen();
 
   while(true) {
     cli->processIo();
@@ -37,8 +38,7 @@ void Cli::processIo() {
 }
 
 void Cli::printHelpText() {
-  // print help text
-	int input=0;
+
   std::cout << "Available commands:" <<std::endl;
   std::cout << "------------------" <<std::endl;
   std::cout <<"Help" << std::endl;
@@ -47,6 +47,14 @@ void Cli::printHelpText() {
   std::cout <<"Log in" << std::endl;
   std::cout <<"Exit" << std::endl;
 
+  }
+
+  void Cli::printWelcomeScreen() {
+
+  std::cout << " =============\nWelcome to SSMS\n ============= \n" << std::endl;
+  std::cout <<"Created by Team Coral 2020" << std::endl;
+  std::cout <<"Irfan, Gopi, Karthik, Naief, Oskar, Tamas \n\n" << std::endl;
+  std::cout <<"Type command, Help or ? for help \n" << std::endl;
   }
 
 
@@ -62,10 +70,9 @@ std::string Cli::getPrompt() {
   return tmpPrompt;
 }
 
-bool Cli::createUser()
-{
+bool Cli::createUser() {
 	std::string userId, password;
-	// Just to take input from user
+
 	std::cout<<"Enter your User Id:";
 	std::cin>>userId;
 	password = Cli::inputPassword("Please enter the password: ");
@@ -95,8 +102,6 @@ bool Cli::logIn()
 
 	std::cout<<"Enter your username:"<< std::endl;
 	std::cin>>input;
-
-
 
   // Here we should:
   // check if user name exist in the list of users ; userMap_.emplace(input, cli).second
@@ -187,7 +192,7 @@ int Cli::getch()
     cli->menuItems = initMap;
     cli->menuItems.emplace("Help", std::bind(&Cli::printHelpText, cli));
     cli->menuItems.emplace("help", std::bind(&Cli::printHelpText, cli));
-    cli->menuItems.emplace("h", std::bind(&Cli::printHelpText, cli));
+    cli->menuItems.emplace("?", std::bind(&Cli::printHelpText, cli));
     cli->menuItems.emplace("Create User", std::bind(&Cli::createUser, cli));
     cli->menuItems.emplace("Delete User", std::bind(&Cli::deleteUser, cli));
     cli->menuItems.emplace("Log in", std::bind(&Cli::logIn, cli));

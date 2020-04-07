@@ -12,17 +12,13 @@ typedef std::unordered_map<std::string, std::function<void()>> menu_map;
 namespace ssms{
 class Cli
 {
-
-    //typedef void (*MenuItem)(void);
-    //typedef std::unordered_map<std::string, Cli::MenuItem> menu_map;
-
-
   public:
     static void start(void);
     std::string getPrompt();
     std::string setPrompt();
     User *getLoggedInUser();
     void printHelpText();
+    void printWelcomeScreen();
     void interpretInput(std::string input);
     void setMenuLoggedInUser();
     void setMenuNotLoggedInUser();
