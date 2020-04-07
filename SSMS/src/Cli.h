@@ -17,9 +17,9 @@ class Cli
     virtual ~Cli();
     void processIo();
     void printHelpText();
-    bool createUser(User &user);
-    bool deleteUser(User &user);
-    bool logIn(std::string username, std::string password); // remove
+    bool createUser();
+    bool deleteUser();
+    bool logIn(); // remove
     bool userLoggedIn;
     std::string propmt;
     std::map <std::string, User> users;
