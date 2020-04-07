@@ -33,7 +33,7 @@ public:
    * Constructor
    * @param owner User to whom the mailbox belongs
    */
-  MailBox(const User& owner);
+  MailBox(std::shared_ptr<User> owner);
 
   /**
    * Throw message encrypted to the mailbox
@@ -53,7 +53,7 @@ public:
   void clear();
 
 private:
-  const User& owner_;
+  std::shared_ptr<User> owner_;
   std::list<Msg> mailbox_;
 };
 

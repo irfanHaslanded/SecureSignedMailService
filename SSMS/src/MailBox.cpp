@@ -16,13 +16,13 @@ bool Msg::operator==(const Msg& rhs) const
 
 // MailBox member methods
 
-MailBox::MailBox(const User& owner) : owner_{owner} {};
+MailBox::MailBox(std::shared_ptr<User> owner) : owner_{owner} {};
 
 void MailBox::throwMsg(const Msg& plain_msg)
 {
   Msg encrypted_msg {};
   if (Crypto::encrypt(plain_msg.text,
-                      owner_.getPublicKey(),
+                      owner_->getPublicKey(),
                       encrypted_msg.text,
                       encrypted_msg.evp_pars))
   {
@@ -38,7 +38,7 @@ std::list<Msg> MailBox::getReceivedMsgs() const
   for (const auto& encrypted_msg : mailbox_)
   {
     if (Crypto::decrypt(encrypted_msg.text,
-                        owner_.getPrivateKey(),
+                        owner_->getPrivateKey(),
                         decrypted_msg.text,
                         encrypted_msg.evp_pars))
     {

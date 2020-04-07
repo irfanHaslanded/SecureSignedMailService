@@ -18,52 +18,107 @@ Test_User::~Test_User() {
   // TODO Auto-generated destructor stub
 }
 
-TEST(Test_User, Create)
-{
-  const std::string the_id("alice");
-  User alice(the_id);
-  ASSERT_EQ(alice.getId(), the_id);
+void Test_User::SetUp() {
 }
 
-TEST(Test_User, AlreadyExists)
-{
-  User user1("alice");
-  ASSERT_THROW(User user2("alice"), UserAlreadyExists);
+void Test_User::TearDown() {
+  User::removeAll();
 }
 
-TEST(Test_User, NoInitialName)
+TEST_F(Test_User, Create)
 {
-  User user("alice");
-  ASSERT_EQ(user.getName(), std::string());
+  ASSERT_NE(User::create("asdf"), nullptr);
 }
 
-TEST(Test_User, SetName)
+TEST_F(Test_User, CreateId)
 {
-  User alice("alice");
+  const std::string id { "asdf" };
+  ASSERT_EQ(User::create(id)->getId(), id);
+}
+
+TEST_F(Test_User, GetUser)
+{
+  const std::string id { "alice" };
+  User::create(id);
+  auto u = User::get(id);
+  ASSERT_EQ(id, u->getId());
+}
+
+TEST_F(Test_User, NoSuchUser)
+{
+  ASSERT_EQ(User::get("alice"), nullptr);
+}
+
+TEST_F(Test_User, RemoveUser)
+{
+  User::create("a");
+  User::remove("a");
+  ASSERT_EQ(User::get("a"), nullptr);
+}
+
+TEST_F(Test_User, RemoveAllUsers)
+{
+  User::create("a");
+  User::create("b");
+  User::removeAll();
+  ASSERT_EQ(User::get("a"), nullptr);
+  ASSERT_EQ(User::get("b"), nullptr);
+  ASSERT_EQ(User::getIdList().size(), 0);
+}
+
+TEST_F(Test_User, AlreadyExists)
+{
+  const std::string id { "alice" };
+  User::create(id);
+  ASSERT_THROW(User::create(id), UserAlreadyExists);
+}
+
+TEST_F(Test_User, IdListSize)
+{
+  User::create("a");
+  User::create("b");
+  ASSERT_EQ(User::getIdList().size(), 2);
+}
+
+TEST_F(Test_User, IdListContent)
+{
+  User::create("a");
+  ASSERT_EQ(User::getIdList().front(), "a");
+}
+
+TEST_F(Test_User, InitialNameIsId)
+{
+  auto user = User::create("alice");
+  ASSERT_EQ(user->getName(), user->getId());
+}
+
+TEST_F(Test_User, SetName)
+{
+  auto alice = User::create("alice");
   const std::string the_name("Alice Whois");
-  alice.setName(the_name);
-  ASSERT_EQ(alice.getName(), the_name);
+  alice->setName(the_name);
+  ASSERT_EQ(alice->getName(), the_name);
 }
 
-TEST(Test_User, SendMessage)
+TEST_F(Test_User, SendMessage)
 {
-  User alice("alice");
-  User bob("bob");
+  auto alice = User::create("alice");
+  auto bob   = User::create("bob");
 
-  ASSERT_EQ(bob.showInbox(), 0);
-  ASSERT_EQ(alice.showInbox(), 0);
-  ASSERT_TRUE(alice.sendMessage("bob", "Hello Bob! It's Alice"));
-  ASSERT_TRUE(alice.sendMessage("bob", "Hello Bob! It's Alice again"));
-  ASSERT_EQ(bob.showInbox(), 2);
+  ASSERT_EQ(bob->showInbox(), 0);
+  ASSERT_EQ(alice->showInbox(), 0);
+  ASSERT_TRUE(alice->sendMessage("bob", "Hello Bob! It's Alice"));
+  ASSERT_TRUE(alice->sendMessage("bob", "Hello Bob! It's Alice again"));
+  ASSERT_EQ(bob->showInbox(), 2);
 }
 
-TEST(Test_User, EmptyInbox)
+TEST_F(Test_User, EmptyInbox)
 {
-  User alice("alice");
-  User bob("bob");
+  auto alice = User::create("alice");
+  auto bob   = User::create("bob");
 
-  alice.sendMessage("bob", "msg1");
-  alice.sendMessage("bob", "msg2");
-  bob.emptyInbox();
-  ASSERT_EQ(bob.showInbox(), 0);
+  alice->sendMessage("bob", "msg1");
+  alice->sendMessage("bob", "msg2");
+  bob->emptyInbox();
+  ASSERT_EQ(bob->showInbox(), 0);
 }

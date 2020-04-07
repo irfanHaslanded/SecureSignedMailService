@@ -10,10 +10,12 @@
 #include <gtest/gtest.h>
 
 
-class Test_User : testing::Test {
-public:
+class Test_User : public ::testing::Test {
+protected:
   Test_User();
   virtual ~Test_User();
+  virtual void SetUp() override;
+  virtual void TearDown() override;
 };
 
 #endif /* SRC_UNITTEST_USER_H_ */

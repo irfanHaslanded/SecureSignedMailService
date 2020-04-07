@@ -36,7 +36,7 @@ class Cli
     std::string propmt;
     std::map <std::string, User> users;
     menu_map menuItems;
-    User *loggedInUser;
+    std::shared_ptr<User> loggedInUser;
     static struct option long_options[];
 };
 }

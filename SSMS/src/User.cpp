@@ -13,27 +13,55 @@ UserAlreadyExists::UserAlreadyExists(const std::string& id) : id_(id) {}
 std::string UserAlreadyExists::getId() { return id_; }
 
 // Static members
-std::map<std::string, User*> User::userMap_{};
+std::map<std::string, std::shared_ptr<User>> User::userMap_{};
 
 // Member methods
-User::User(const std::string& id) : id_(id)
-                                  , name_ (id)
-                                  , inbox_(MailBox(*this))
-{
-  if (!userMap_.emplace(id_, this).second)
-  {
-    throw UserAlreadyExists(id_);
+User::User(const std::string& id) : id_(id), name_(id) {}
 
-  }
-  if (!Crypto::generateRsaKeypair(private_key_, public_key_))
+User::~User() {}
+
+std::shared_ptr<User> User::create(const std::string& id)
+{
+  std::shared_ptr<User> user(new User(id));
+  user->inbox_ = std::shared_ptr<MailBox>(new MailBox(user));
+
+  if (!Crypto::generateRsaKeypair(user->private_key_, user->public_key_))
   {
     throw std::runtime_error("Key-pair generation failed");
   }
+
+  if (!userMap_.emplace(id, user).second)
+  {
+    throw UserAlreadyExists(id);
+  }
+
+  return user;
 }
 
-User::~User()
+std::shared_ptr<User> User::get(const std::string& id)
 {
-  userMap_.erase(id_);
+  auto user_search = userMap_.find(id);
+  return user_search == userMap_.end() ? nullptr : user_search->second;
+}
+
+std::list<std::string> User::getIdList()
+{
+  std::list<std::string> user_list;
+  for (const auto& it : userMap_)
+  {
+    user_list.push_back(it.first);
+  }
+  return user_list;
+}
+
+void User::remove(const std::string& id)
+{
+  (void)userMap_.erase(id);
+}
+
+void User::removeAll()
+{
+  userMap_.clear();
 }
 
 void User::setName(const std::string& name)
@@ -89,12 +117,12 @@ bool User::sendMessage(const std::string& recipient_id, const std::string& msg)
 
 void User::sendMessage(User& recipient, const std::string& msg)
 {
-  recipient.inbox_.throwMsg(Msg{this->getId(), msg});
+  recipient.inbox_->throwMsg(Msg{this->getId(), msg});
 }
 
 size_t User::showInbox()
 {
-  const auto receivedMsgs = inbox_.getReceivedMsgs();
+  const auto receivedMsgs = inbox_->getReceivedMsgs();
   for (const auto &msg : receivedMsgs) {
     const auto user_search =
         userMap_.find(msg.sender_id); // sender might already be deleted or just
@@ -109,7 +137,7 @@ size_t User::showInbox()
 
 void User::emptyInbox()
 {
-  inbox_.clear();
+  inbox_->clear();
 }
 
 }

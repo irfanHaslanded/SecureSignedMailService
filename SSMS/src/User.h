@@ -9,6 +9,7 @@
 
 #include <map>
 #include <exception>
+#include <memory>
 
 namespace ssms {
 
@@ -24,8 +25,14 @@ public:
 class User {
 
 public:
-  User(const std::string& id);
-  ~User();
+  User() = delete;
+  virtual ~User();
+
+  static std::shared_ptr<User> create(const std::string& id);
+  static std::shared_ptr<User> get(const std::string& id);
+  static std::list<std::string> getIdList();
+  static void remove(const std::string& id);
+  static void removeAll();
 
   const std::string& getId() const;
   void setName(const std::string& name);
@@ -43,15 +50,8 @@ public:
   size_t showInbox();
   void emptyInbox();
 
-  // void addContact(std::string username);
-  // void addContact(std::string username, std::string nickname);
-  // void addContactById(int userId);
-  // void addContactById(int userId, std::string nickname);
-
-  // void displayMessage(int msgId);
-  // void createMessage(std::string msg, User recipient);
-  // void deleteMessage(int id);
-  // void sendAll();
+private:
+  User(const std::string& id);
 
 private:
   std::string id_;
@@ -59,10 +59,10 @@ private:
   std::string hash_;
   std::string private_key_;
   std::string public_key_;
-  MailBox inbox_;
+  std::shared_ptr<MailBox> inbox_;
   //MailBox outbox;
 
-  static std::map<std::string, User*> userMap_;
+  static std::map<std::string, std::shared_ptr<User>> userMap_;
 };
 
 }

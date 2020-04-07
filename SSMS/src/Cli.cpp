@@ -77,11 +77,15 @@ bool Cli::createUser() {
 	std::cin>>userId;
 	password = Cli::inputPassword("Please enter the password: ");
 
-	User* user = new User(userId);
-	user->setPassword(password);
-	std::cout<<"User Created"<<std::endl;
-
-	return true;
+  try {
+		auto user = User::create(userId);
+		user->setPassword(password);
+		std::cout<<"User Created"<<std::endl;
+		return true;
+	} catch (std::exception& e) {
+		std::cout<<e.what()<<std::endl;
+		return false;
+	}
 }
 
 bool Cli::deleteUser() {
@@ -113,9 +117,12 @@ bool Cli::logIn()
   // As for now make a dummy User and have it as active user.
 
   std::string dummyUserName = "banQuo";
-  static User tmpUser(dummyUserName);
+  static std::shared_ptr<User> dummyUser = nullptr;
+  if (!dummyUser) {
+    dummyUser = User::create(dummyUserName);
+  }
   //TODO: should point at the user in the user map.
-  cli->loggedInUser = &tmpUser;
+  cli->loggedInUser = dummyUser;
 
   return true;
 }

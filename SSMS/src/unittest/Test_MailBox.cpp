@@ -10,6 +10,8 @@
 #include "../MailBox.h"
 #include "../User.h"
 
+using namespace ssms;
+
 Test_MailBox::Test_MailBox() {
   // TODO Auto-generated constructor stub
 }
@@ -18,32 +20,34 @@ Test_MailBox::~Test_MailBox() {
   // TODO Auto-generated destructor stub
 }
 
-using namespace ssms;
+void Test_MailBox::SetUp() {
+}
 
-TEST(Test_MailBox, Init)
+void Test_MailBox::TearDown() {
+  User::removeAll();
+}
+
+TEST_F(Test_MailBox, Init)
 {
-  User a {"alice"};
-  MailBox mb {a};
+  MailBox mb { User::create("alice") };
   ASSERT_EQ(mb.getReceivedMsgs().size(), 0);
 }
 
-TEST(Test_MailBox, ThrowMsg)
+TEST_F(Test_MailBox, ThrowMsg)
 {
-  User a {"alice"};
-  User b {"bob"};
+  auto a = User::create("alice");
+  MailBox mb { User::create("bob") };
 
-  MailBox mb {b};
-  mb.throwMsg( Msg {a.getId(), "asdf"} );
+  mb.throwMsg( Msg {a->getId(), "asdf"} );
   ASSERT_EQ(mb.getReceivedMsgs().size(), 1);
 }
 
-TEST(Test_MailBox, GetReceivedMsgs)
+TEST_F(Test_MailBox, GetReceivedMsgs)
 {
-  User a {"alice"};
-  User b {"bob"};
-  MailBox mb {b};
+  auto a = User::create("alice");
+  MailBox mb { User::create("bob") };
 
-  const Msg msg {a.getId(), " Hello!"};
+  const Msg msg {a->getId(), " Hello!"};
   mb.throwMsg(msg);
   const auto receivedMsgs = mb.getReceivedMsgs();
   ASSERT_NE(receivedMsgs.begin(), receivedMsgs.end());
@@ -53,13 +57,12 @@ TEST(Test_MailBox, GetReceivedMsgs)
   std::cout << "Decrypted text: '" << it.text  << "'" << std::endl;
 }
 
-TEST(Test_MailBox, Clear)
+TEST_F(Test_MailBox, Clear)
 {
-  User a {"alice"};
-  User b {"bob"};
-  MailBox mb {b};
+  auto a = User::create("alice");
+  MailBox mb { User::create("bob") };
 
-  mb.throwMsg(Msg {a.getId(), "Hello!"});
+  mb.throwMsg(Msg {a->getId(), "Hello!"});
   mb.clear();
   ASSERT_EQ(mb.getReceivedMsgs().size(), 0);
 }
