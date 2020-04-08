@@ -1,3 +1,16 @@
+/*
+*         Cli.cpp
+* Main user interface for this SSMS application.
+* Runs an infinite loop waiting for user input,
+* the cli has a menu (wip) that is dynamic in the sense that
+* it changes depending on user privileges. By typing keywords
+* in the commandline the menu matches the input to the corresponing
+* function to be executed.
+*
+* Created by Team Coral 2020
+*/
+
+
 #include <iostream>
 #include <iterator>
 #include <unistd.h>
@@ -11,6 +24,14 @@ namespace ssms {
 
 static Cli *cli = NULL;
 static bool run = true;
+
+/*
+* Cli::start
+* Main entry point, called from main.
+* Initializes a cli object, with menu in default state
+* and prints welcome screen/info message.
+*
+*/
 void Cli::start(void) {
 
   cli = new Cli();
@@ -28,6 +49,14 @@ Cli::Cli() {
 Cli::~Cli() {
 }
 
+/*
+* Cli::processIo
+*
+* Main idle state. Wait for user input and
+* when received interpret input.
+* getline used instead of cin >> to not break if
+* there are spaces present in the input.
+*/
 void Cli::processIo() {
 
   std::cout << Cli::getPrompt();
@@ -37,6 +66,13 @@ void Cli::processIo() {
 
   interpretInput(input);
 }
+
+/*
+* Cli::printHelpText
+*
+* Prints currently available commands, depending
+* on user role and program state. (WIP)
+*/
 
 void Cli::printHelpText() {
 
@@ -64,6 +100,12 @@ void Cli::printHelpText() {
 
   }
 
+
+/*
+* Cli::printWelcomeScreen
+*
+* Prints welcome screen (called once at startup)
+*/
   void Cli::printWelcomeScreen() {
 
   std::cout << " =============\nWelcome to SSMS\n ============= \n" << std::endl;
@@ -72,7 +114,12 @@ void Cli::printHelpText() {
   std::cout <<"Type command, Help or ? for help \n" << std::endl;
   }
 
-
+/*
+* Cli::getPrompt
+* Returns a string with the current prompt.
+* as of now it simply adds the username in the case
+* where a user is logged in.
+*/
 std::string Cli::getPrompt() {
   std::string tmpPrompt;
 
@@ -85,6 +132,13 @@ std::string Cli::getPrompt() {
   return tmpPrompt;
 }
 
+/*
+* Cli::createUSer
+*
+* Creates a user (duh) by calling the User class,
+* the users are identified by a unique ID, and added
+* to the main list of users, also stored in the User class.
+*/
 bool Cli::createUser() {
   std::string userId, password;
 
@@ -102,7 +156,15 @@ bool Cli::createUser() {
     return false;
   }
 }
-// Might modify it. Create a function that can be use in both delete and login.
+
+/*
+* Cli::createUSer
+*
+* Deletes a user (spoiler!) by calling the corresponding function in
+* the User class,.
+* Deleting a user simply means removing the object from the list of
+* users in the User class, freeing up that user ID.
+*/
 bool Cli::deleteUser() {
 
   std::string userId;
@@ -134,6 +196,14 @@ bool Cli::deleteUser() {
   }
   return true;
 }
+
+
+/*
+* Cli::logIn
+*
+* Opens the log-in screen to log in as a particular
+* (existing/pre-created) user.
+*/
 
 bool Cli::logIn()
 {
@@ -169,11 +239,23 @@ bool Cli::logIn()
 
 }
 
+/*
+* Cli::logOut
+*
+* Logs out the current user,
+* and switches the menu to the appropriate state.
+*/
 void Cli::logOut()
 {
   cli->setMenuNotLoggedInUser();
   cli->loggedInUser = nullptr;
 }
+
+/*
+* Cli::inputPassword
+* Special function to mask input when typing passwords
+*
+*/
 
 std::string Cli::inputPassword(const char *prompt)
 {
@@ -207,6 +289,12 @@ std::string Cli::inputPassword(const char *prompt)
   return password;
 }
 
+/* Cli::getch
+* Get char function for the purposes of this application
+* TODO: Naief please elaborate on this functionality.
+*/
+
+
 int Cli::getch()
 {
   int ch;
@@ -223,6 +311,16 @@ int Cli::getch()
   return ch;
 }
 
+/*
+*  Cli::interpretInput
+*  Takes input from the main loop via processIo().
+*  This function formats and matches the input vs the given keys
+*  (which are tied to commands/functions) in the menuItems map.
+*
+*  If valid command in current state -> execute command
+*  if not -> print invalid input msg
+*/
+
  void Cli::interpretInput(std::string input)
  {
     //Make input lowercase and remove spaces, purely for easier handling
@@ -238,6 +336,11 @@ int Cli::getch()
     }
  };
 
+/*
+*   Cli::listUsers
+*   Prints all existing users by accessing the list of users from
+*   the User class.
+*/
 
   void Cli::listUsers()
   {
@@ -247,6 +350,13 @@ int Cli::getch()
     std::copy(userList.begin(), userList.end(),
               std::ostream_iterator<std::string>(std::cout,"\n"));
   };
+
+
+/*
+*   Cli::sendMessage
+*   (logged in users only) creates and sends a message to a
+*   given recipient. Both are inputed via command line
+*/
 
   void Cli::sendMessage()
   {
@@ -268,13 +378,30 @@ int Cli::getch()
     }
   }
 
+/*
+*   Cli::showInbox
+*   (logged in users only). Displays all received messages for the current user,
+*   and who has sent it.
+*/
+
   void Cli::showInbox(){
     auto sizeInbox = cli->loggedInUser->showInbox();
   };
 
+/*
+*   Cli::showSentMessage
+*   (logged in users only). Displays all sent messages for the current user,
+*   and to whom it was sent.
+*/
   void Cli::showSentMessages(){
     auto sizeInbox = cli->loggedInUser->showOutbox();
   };
+
+
+/* Cli::quit
+* Breaks the main loop in CLI. As for now this
+* makes us return to main and terminate.
+*/
 
   void Cli::quit()
   {
@@ -282,9 +409,18 @@ int Cli::getch()
     std::cout << "Exit." << std::endl;
   }
 
-// TODO: description, nicer way of handling similar inputs (h, help etc).
-// other set of inputs for logged in and not logged in users, maybe separate class
-// fix exit function
+// TODO:
+// Make separate class with objects containing function/key pairs
+// as well as unique help messages. Makes it easier to maintain and
+// to have users with different priviligies
+//  Also helps making separate pages/sub menus
+
+  /*
+  *   Cli::setMenuNotLoggedInUser
+  *
+  *   Sets the available commands for non logged in users.
+  *   each input maps to a function call in the cli object
+  */
   void Cli::setMenuNotLoggedInUser()
   {
     menu_map initMap;
@@ -298,6 +434,12 @@ int Cli::getch()
     cli->menuItems.emplace("quit", std::bind(&Cli::quit, cli));
   };
 
+  /*
+  *   Cli::setMenuLoggedInUser
+  *
+  *   Sets the available commands for logged in users.
+  *   each input maps to a function call in the cli object
+  */
   void Cli::setMenuLoggedInUser()
   {
     menu_map initMap;
