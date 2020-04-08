@@ -29,6 +29,7 @@ class Cli
     void processIo();
     bool createUser();
     bool deleteUser();
+    void logOut();
     bool logIn(); // remove
     int getch();
     std::string inputPassword(const char *prompt);

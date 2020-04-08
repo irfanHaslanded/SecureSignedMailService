@@ -87,44 +87,76 @@ bool Cli::createUser() {
 		return false;
 	}
 }
-
+// Might modify it. Create a function that can be use in both delete and login.
 bool Cli::deleteUser() {
 
+	std::string userId;
+	std::string password;
+
+	std::cout<<"Enter userId to delete:"<< std::endl;
+	std::cin>>userId;
+  //check if user exist.
+	if (User::get(userId) == nullptr)
+	{
+		std::cout<<"User doesnt exist."<< std::endl;
+	}
+	else
+	{
+    //user already exists
+	  auto user = User::get(userId);
+	  std::cout<<"Please enter password:"<< std::endl;
+		std::cin>>password;
+    if(user->checkPassword(password))
+    {
+    	user->remove(userId);
+    	std::cout<<"User Deleted"<< std::endl;
+    }
+    else
+    {
+    	std::cout<<"Wrong Password. Cant delete user."<< std::endl;
+    }
+
+	}
   return true;
 }
 
 bool Cli::logIn()
 {
-  //First
-  //check if ANY user exist -> if not, tell the user to create one.
-  /*
-      if(no users)
-      cout<< No existing users, create one first!
-  */
+	std::string userId;
+	std::string password;
 
-	std::string input;
+	std::cout<<"Enter your userId:"<< std::endl;
+	std::cin>>userId;
+  //check if ANY user exist.
+	if (User::get(userId) == nullptr)
+	{
+		std::cout<<"User doesnt exist."<< std::endl;
+		return false;
+	}
+	else
+	{
+    //user already exists
+	  auto user = User::get(userId);
+	  std::cout<<"Please enter your password:"<< std::endl;
+		std::cin>>password;
+    if(user->checkPassword(password))
+    {
+  	  cli->loggedInUser = user;
+  	  return true;
+    }
+    else
+    {
+    	std::cout<<"Wrong Password."<< std::endl;
+      return false;
+    }
 
-	std::cout<<"Enter your username:"<< std::endl;
-	std::cin>>input;
+	}
 
-  // Here we should:
-  // check if user name exist in the list of users ; userMap_.emplace(input, cli).second
-  // or with userMap.at()
+}
 
-  // if so require password,
-  // then set current user to that user.
-
-  // As for now make a dummy User and have it as active user.
-
-  std::string dummyUserName = "banQuo";
-  static std::shared_ptr<User> dummyUser = nullptr;
-  if (!dummyUser) {
-    dummyUser = User::create(dummyUserName);
-  }
-  //TODO: should point at the user in the user map.
-  cli->loggedInUser = dummyUser;
-
-  return true;
+void Cli::logOut()
+{
+	cli->loggedInUser = NULL;
 }
 
 std::string Cli::inputPassword(const char *prompt)
