@@ -50,6 +50,7 @@ void MailBox::throwMsg(const Msg& plain_msg)
     mailbox_.push_back(encrypted_msg);
 
     std::cerr << "\n===== MESSAGE BEGIN ====="
+              << "\nMailbox owner: " << owner_->getId()
               << encrypted_msg
               << "===== MESSAGE END ===="
               << std::endl;
