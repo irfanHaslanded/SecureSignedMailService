@@ -146,7 +146,9 @@ size_t User::printMsgs(std::shared_ptr<MailBox> mailBox)
     std::cout << "From: " <<  msg.sender_id
               << "\nTo:   " <<  msg.receiver_id
               << "\nMessage:"
-              << msg.text << std::endl;
+              << msg.text
+              << "\n---------------"
+              << std::endl;
   }
   return Msgs.size();
 }
