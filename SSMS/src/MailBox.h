@@ -13,10 +13,11 @@ class User;
 
 struct Msg {
   std::string sender_id; /** user id of the sender */
+  std::string receiver_id; /** user id of the sender */
   std::string text;      /** text of the message */
   CryptoEvpPars evp_pars;
   Msg();
-  Msg(const std::string& sender_id , const std::string& text);
+  Msg(const std::string& sender_id , const std::string& text, const std::string& receiver_id);
   bool operator==(const Msg& rhs) const;
 };
 
@@ -42,10 +43,11 @@ public:
   void throwMsg(const Msg& plain_msg);
 
   /**
-   * Get all the received messages
+   * Get all the messages in the mailbox
    * @returns a list of decrypted messages
    */
-  std::list<Msg> getReceivedMsgs() const;
+  std::list<Msg> getMsgs() const;
+
 
   /**
    * Empty inbox

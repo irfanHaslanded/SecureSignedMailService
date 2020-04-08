@@ -24,6 +24,7 @@ std::shared_ptr<User> User::create(const std::string& id)
 {
   std::shared_ptr<User> user(new User(id));
   user->inbox_ = std::shared_ptr<MailBox>(new MailBox(user));
+  user->outbox_ = std::shared_ptr<MailBox>(new MailBox(user));
 
   if (!Crypto::generateRsaKeypair(user->private_key_, user->public_key_))
   {
@@ -117,27 +118,42 @@ bool User::sendMessage(const std::string& recipient_id, const std::string& msg)
 
 void User::sendMessage(User& recipient, const std::string& msg)
 {
-  recipient.inbox_->throwMsg(Msg{this->getId(), msg});
+  recipient.inbox_->throwMsg(Msg{this->getId(), msg, recipient.id_});
+  outbox_->throwMsg(Msg{this->getId(), msg, recipient.id_});
 }
 
 size_t User::showInbox()
 {
-  const auto receivedMsgs = inbox_->getReceivedMsgs();
-  for (const auto &msg : receivedMsgs) {
+  return printMsgs(inbox_);
+}
+
+size_t User::showOutbox()
+{
+  return printMsgs(outbox_);
+}
+
+size_t User::printMsgs(std::shared_ptr<MailBox> mailBox)
+{
+  const auto Msgs = mailBox->getMsgs();
+  for (const auto &msg : Msgs) {
     const auto user_search =
         userMap_.find(msg.sender_id); // sender might already be deleted or just
                                       // having no name set
     std::cout << (user_search != userMap_.end() && !user_search->second->getName().empty()
-                      ? user_search->second->getName() + " <" + msg.sender_id + ">"
+                      ? user_search->second->getName() + " <" + msg.sender_id + " to " + msg.receiver_id + ">"
                       : msg.sender_id)
               << ": " << msg.text << std::endl;
   }
-  return receivedMsgs.size();
+  return Msgs.size();
 }
-
 void User::emptyInbox()
 {
   inbox_->clear();
+}
+
+void User::emptyOutbox()
+{
+  outbox_->clear();
 }
 
 }

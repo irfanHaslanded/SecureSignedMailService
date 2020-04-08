@@ -48,10 +48,13 @@ public:
   bool sendMessage(const std::string& recipient_id, const std::string& msg);
   void sendMessage(User& recipient, const std::string& msg);
   size_t showInbox();
+  size_t showOutbox();
   void emptyInbox();
+  void emptyOutbox();
 
 private:
   User(const std::string& id);
+  size_t printMsgs(std::shared_ptr<MailBox> mailBox);
 
 private:
   std::string id_;
@@ -60,8 +63,7 @@ private:
   std::string private_key_;
   std::string public_key_;
   std::shared_ptr<MailBox> inbox_;
-  //MailBox outbox;
-
+  std::shared_ptr<MailBox> outbox_;
   static std::map<std::string, std::shared_ptr<User>> userMap_;
 };
 

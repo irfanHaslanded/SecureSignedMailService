@@ -6,11 +6,11 @@ namespace ssms {
 
 // Message
 Msg::Msg() {}
-Msg::Msg(const std::string& sender_id , const std::string& text)
-  : sender_id(sender_id) , text(text) {}
+Msg::Msg(const std::string& sender_id , const std::string& text, const std::string& receiver_id)
+  : sender_id(sender_id) , text(text), receiver_id(receiver_id) {}
 bool Msg::operator==(const Msg& rhs) const
 {
-  return this->sender_id == rhs.sender_id &&
+  return this->sender_id == rhs.sender_id && this->receiver_id == rhs.receiver_id &&
          this->text      == rhs.text;
 }
 
@@ -27,13 +27,14 @@ void MailBox::throwMsg(const Msg& plain_msg)
                       encrypted_msg.evp_pars))
   {
     encrypted_msg.sender_id = plain_msg.sender_id;
+    encrypted_msg.receiver_id = plain_msg.receiver_id;
     mailbox_.push_back(encrypted_msg);
   }
 }
 
-std::list<Msg> MailBox::getReceivedMsgs() const
+std::list<Msg> MailBox::getMsgs() const
 {
-  std::list<Msg> decrypted_received_msgs;
+  std::list<Msg> decrypted_msgs;
   Msg decrypted_msg {};
   for (const auto& encrypted_msg : mailbox_)
   {
@@ -43,10 +44,11 @@ std::list<Msg> MailBox::getReceivedMsgs() const
                         encrypted_msg.evp_pars))
     {
       decrypted_msg.sender_id = encrypted_msg.sender_id;
-      decrypted_received_msgs.push_back(decrypted_msg);
+      decrypted_msg.receiver_id = encrypted_msg.receiver_id;
+      decrypted_msgs.push_back(decrypted_msg);
     }
   }
-  return decrypted_received_msgs;
+  return decrypted_msgs;
 }
 
 void MailBox::clear()

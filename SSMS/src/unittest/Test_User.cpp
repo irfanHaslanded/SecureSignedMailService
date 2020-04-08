@@ -107,9 +107,12 @@ TEST_F(Test_User, SendMessage)
 
   ASSERT_EQ(bob->showInbox(), 0);
   ASSERT_EQ(alice->showInbox(), 0);
+  ASSERT_EQ(bob->showOutbox(), 0);
+  ASSERT_EQ(alice->showOutbox(), 0);
   ASSERT_TRUE(alice->sendMessage("bob", "Hello Bob! It's Alice"));
   ASSERT_TRUE(alice->sendMessage("bob", "Hello Bob! It's Alice again"));
   ASSERT_EQ(bob->showInbox(), 2);
+  ASSERT_EQ(alice->showOutbox(), 2);
 }
 
 TEST_F(Test_User, EmptyInbox)
@@ -121,4 +124,15 @@ TEST_F(Test_User, EmptyInbox)
   alice->sendMessage("bob", "msg2");
   bob->emptyInbox();
   ASSERT_EQ(bob->showInbox(), 0);
+}
+
+TEST_F(Test_User, EmptyOutbox)
+{
+  auto alice = User::create("alice");
+  auto bob   = User::create("bob");
+
+  alice->sendMessage("bob", "msg1");
+  alice->sendMessage("bob", "msg2");
+  alice->emptyOutbox();
+  ASSERT_EQ(alice->showOutbox(), 0);
 }
