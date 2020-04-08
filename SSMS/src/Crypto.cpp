@@ -45,7 +45,7 @@ std::string Crypto::genPassword(const std::string &password)
 std::string Crypto::passTheSalt()
 {
   int j = 0;
-  
+
   unsigned char saltData[saltSize] = "";
   RAND_bytes(saltData, saltSize);
 
@@ -62,7 +62,7 @@ std::string Crypto::genHash(const std::string &salt,
 {
   struct crypt_data buf;
   buf.initialized = 0;
-  
+
   char* encPwd = crypt_r(rawPwd.c_str(), salt.c_str(), &buf);
   std::string s(encPwd);
   std::cout << s << std::endl; //for UT debugging purposes
@@ -285,4 +285,4 @@ bool Crypto::decrypt(const std::string& encrypted_message,
 
   return true;
 }
-} 
+}

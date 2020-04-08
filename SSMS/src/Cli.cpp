@@ -56,8 +56,6 @@ void Cli::printHelpText() {
       std::cout << "Help"<< std::endl;
       std::cout << "help"<< std::endl;
       std::cout << "?"<< std::endl;
-      std::cout << "Create User"<< std::endl;
-      std::cout << "Delete User"<< std::endl;
       std::cout << "List Users"<< std::endl;
       std::cout << "Send Message"<< std::endl;
       std::cout << "Show Inbox"<< std::endl;
@@ -206,8 +204,6 @@ std::string Cli::inputPassword(const char *prompt)
      }
   }
   std::cout<<std::endl;
-  std::cout<<"You entered:"<< password; //Remove in final version. Only for demo
-  std::cout<<std::endl;
 
   return password;
 }
@@ -230,15 +226,17 @@ int Cli::getch()
 
  void Cli::interpretInput(std::string input)
  {
+    //Make input lowercase and remove spaces, purely for easier handling
+    transform(input.begin(), input.end(), input.begin(), ::tolower);
+    input.erase(remove_if(input.begin(), input.end(), isspace), input.end());
 
-  if ( cli->menuItems.find(input) == cli->menuItems.end() ) {
-      std::cout<< input << std::endl;
-      std::cout << "Invalid input. type help or ? for a list of commands." << std::endl;
-      return;
-  } else {
-    cli->menuItems.at(input)();
-  }
-
+    if ( cli->menuItems.find(input) == cli->menuItems.end() ) {
+        std::cout<< input << std::endl;
+        std::cout << "Invalid input. type help or ? for a list of commands." << std::endl;
+        return;
+    } else {
+      cli->menuItems.at(input)();
+    }
  };
 
 
@@ -272,14 +270,12 @@ int Cli::getch()
   {
     menu_map initMap;
     cli->menuItems = initMap;
-    cli->menuItems.emplace("Help", std::bind(&Cli::printHelpText, cli));
     cli->menuItems.emplace("help", std::bind(&Cli::printHelpText, cli));
     cli->menuItems.emplace("?", std::bind(&Cli::printHelpText, cli));
-    cli->menuItems.emplace("Create User", std::bind(&Cli::createUser, cli));
-    cli->menuItems.emplace("Delete User", std::bind(&Cli::deleteUser, cli));
-    cli->menuItems.emplace("Log in", std::bind(&Cli::logIn, cli));
+    cli->menuItems.emplace("createuser", std::bind(&Cli::createUser, cli));
+    cli->menuItems.emplace("deleteuser", std::bind(&Cli::deleteUser, cli));
     cli->menuItems.emplace("login", std::bind(&Cli::logIn, cli));
-    cli->menuItems.emplace("Exit", std::bind(&Cli::quit, cli));
+    cli->menuItems.emplace("exit", std::bind(&Cli::quit, cli));
     cli->menuItems.emplace("quit", std::bind(&Cli::quit, cli));
   };
 
@@ -288,17 +284,13 @@ int Cli::getch()
   {
     menu_map initMap;
     cli->menuItems = initMap;
-    cli->menuItems.emplace("Help", std::bind(&Cli::printHelpText, cli));
     cli->menuItems.emplace("help", std::bind(&Cli::printHelpText, cli));
     cli->menuItems.emplace("?", std::bind(&Cli::printHelpText, cli));
-    cli->menuItems.emplace("Create User", std::bind(&Cli::createUser, cli));
-    cli->menuItems.emplace("Delete User", std::bind(&Cli::deleteUser, cli));
-    cli->menuItems.emplace("List Users", std::bind(&Cli::listUsers, cli));
-    cli->menuItems.emplace("Send Message", std::bind(&Cli::sendMessage, cli));
-    cli->menuItems.emplace("Show Inbox", std::bind(&Cli::showInbox, cli));
-    cli->menuItems.emplace("Log Out", std::bind(&Cli::logOut, cli));
+    cli->menuItems.emplace("listusers", std::bind(&Cli::listUsers, cli));
+    cli->menuItems.emplace("sendmessage", std::bind(&Cli::sendMessage, cli));
+    cli->menuItems.emplace("showinbox", std::bind(&Cli::showInbox, cli));
     cli->menuItems.emplace("logout", std::bind(&Cli::logOut, cli));
-    cli->menuItems.emplace("Exit", std::bind(&Cli::quit, cli)); //maybe not for logged in?
+    cli->menuItems.emplace("exit", std::bind(&Cli::quit, cli)); //maybe not for logged in?
     cli->menuItems.emplace("quit", std::bind(&Cli::quit, cli));
   };
 }
