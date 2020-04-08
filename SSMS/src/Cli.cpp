@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iterator>
 #include <unistd.h>
 #include <stdio.h>
 #include <string>
@@ -9,14 +10,14 @@
 namespace ssms {
 
 static Cli *cli = NULL;
-
+static bool run = true;
 void Cli::start(void) {
 
   cli = new Cli();
   cli->setMenuNotLoggedInUser();
   cli->printWelcomeScreen();
 
-  while(true) {
+  while(run) {
     cli->processIo();
   }
 }
@@ -40,12 +41,29 @@ void Cli::processIo() {
 void Cli::printHelpText() {
 
   std::cout << "Available commands:" <<std::endl;
-  std::cout << "------------------" <<std::endl;
-  std::cout <<"Help" << std::endl;
-  std::cout <<"Create User" << std::endl;
-  std::cout <<"Delete User" << std::endl;
-  std::cout <<"Log in" << std::endl;
-  std::cout <<"Exit" << std::endl;
+    //not logged in
+    if(cli->loggedInUser == nullptr) {
+      std::cout << "------------------" <<std::endl;
+      std::cout <<"Help" << std::endl;
+      std::cout <<"Create User" << std::endl;
+      std::cout <<"Delete User" << std::endl;
+      std::cout <<"Log in" << std::endl;
+      std::cout <<"Exit" << std::endl;
+    }
+    //User logged in, could be done nicer.
+    else if(cli->loggedInUser != nullptr)
+    {
+      std::cout << "Help"<< std::endl;
+      std::cout << "help"<< std::endl;
+      std::cout << "?"<< std::endl;
+      std::cout << "Create User"<< std::endl;
+      std::cout << "Delete User"<< std::endl;
+      std::cout << "List Users"<< std::endl;
+      std::cout << "Send Message"<< std::endl;
+      std::cout << "Show Inbox"<< std::endl;
+      std::cout << "Log Out"<< std::endl;
+      std::cout << "Exit"<< std::endl;
+    }
 
   }
 
@@ -141,6 +159,7 @@ bool Cli::logIn()
     if(user->checkPassword(password))
     {
       cli->loggedInUser = user;
+      cli->setMenuLoggedInUser();
       return true;
     }
     else
@@ -155,7 +174,7 @@ bool Cli::logIn()
 
 void Cli::logOut()
 {
-  setMenuNotLoggedInUser();
+  cli->setMenuNotLoggedInUser();
   cli->loggedInUser = nullptr;
 }
 
@@ -226,7 +245,10 @@ int Cli::getch()
   void Cli::listUsers()
   {
     auto userList = cli->loggedInUser->getIdList();
-    //todo: nice print function.
+
+    std::cout<<"Registered Users:" << std::endl;
+    std::copy(userList.begin(), userList.end(),
+              std::ostream_iterator<std::string>(std::cout,"\n"));
   };
   void Cli::sendMessage(){
     //Todo functions to read input.
@@ -236,6 +258,12 @@ int Cli::getch()
     auto sizeInbox = cli->loggedInUser->showInbox(); //todo understand this function.
     //todo: nice print function.
   };
+
+  void Cli::quit()
+  {
+    run = false;
+    std::cout << "Exit." << std::endl;
+  }
 
 // TODO: description, nicer way of handling similar inputs (h, help etc).
 // other set of inputs for logged in and not logged in users, maybe separate class
@@ -250,7 +278,9 @@ int Cli::getch()
     cli->menuItems.emplace("Create User", std::bind(&Cli::createUser, cli));
     cli->menuItems.emplace("Delete User", std::bind(&Cli::deleteUser, cli));
     cli->menuItems.emplace("Log in", std::bind(&Cli::logIn, cli));
-    cli->menuItems.emplace("Exit", std::bind(&Cli::logIn, cli));
+    cli->menuItems.emplace("login", std::bind(&Cli::logIn, cli));
+    cli->menuItems.emplace("Exit", std::bind(&Cli::quit, cli));
+    cli->menuItems.emplace("quit", std::bind(&Cli::quit, cli));
   };
 
 
@@ -267,6 +297,8 @@ int Cli::getch()
     cli->menuItems.emplace("Send Message", std::bind(&Cli::sendMessage, cli));
     cli->menuItems.emplace("Show Inbox", std::bind(&Cli::showInbox, cli));
     cli->menuItems.emplace("Log Out", std::bind(&Cli::logOut, cli));
-    cli->menuItems.emplace("Exit", std::bind(&Cli::logIn, cli));
+    cli->menuItems.emplace("logout", std::bind(&Cli::logOut, cli));
+    cli->menuItems.emplace("Exit", std::bind(&Cli::quit, cli)); //maybe not for logged in?
+    cli->menuItems.emplace("quit", std::bind(&Cli::quit, cli));
   };
 }

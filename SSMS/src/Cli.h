@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <functional>
 #include <algorithm>
+#include <stdlib.h>
 
 typedef std::unordered_map<std::string, std::function<void()>> menu_map;
 
@@ -34,6 +35,7 @@ class Cli
     void listUsers();
     void sendMessage();
     void showInbox();
+    void quit();
     bool logIn(); // remove
     int getch();
     std::string inputPassword(const char *prompt);
