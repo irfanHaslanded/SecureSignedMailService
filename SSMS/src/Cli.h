@@ -35,6 +35,7 @@ class Cli
     void listUsers();
     void sendMessage();
     void showInbox();
+    void showSentMessages();
     void quit();
     bool logIn(); // remove
     int getch();

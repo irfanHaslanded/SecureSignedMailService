@@ -54,11 +54,10 @@ void Cli::printHelpText() {
     else if(cli->loggedInUser != nullptr)
     {
       std::cout << "Help"<< std::endl;
-      std::cout << "help"<< std::endl;
-      std::cout << "?"<< std::endl;
       std::cout << "List Users"<< std::endl;
       std::cout << "Send Message"<< std::endl;
       std::cout << "Show Inbox"<< std::endl;
+      std::cout << "Show Outbox"<< std::endl;
       std::cout << "Log Out"<< std::endl;
       std::cout << "Exit"<< std::endl;
     }
@@ -270,8 +269,11 @@ int Cli::getch()
   }
 
   void Cli::showInbox(){
-    auto sizeInbox = cli->loggedInUser->showInbox(); //todo understand this function.
-    //todo: nice print function.
+    auto sizeInbox = cli->loggedInUser->showInbox();
+  };
+
+  void Cli::showSentMessages(){
+    auto sizeInbox = cli->loggedInUser->showOutbox();
   };
 
   void Cli::quit()
@@ -296,7 +298,6 @@ int Cli::getch()
     cli->menuItems.emplace("quit", std::bind(&Cli::quit, cli));
   };
 
-
   void Cli::setMenuLoggedInUser()
   {
     menu_map initMap;
@@ -306,6 +307,7 @@ int Cli::getch()
     cli->menuItems.emplace("listusers", std::bind(&Cli::listUsers, cli));
     cli->menuItems.emplace("sendmessage", std::bind(&Cli::sendMessage, cli));
     cli->menuItems.emplace("showinbox", std::bind(&Cli::showInbox, cli));
+    cli->menuItems.emplace("showoutbox", std::bind(&Cli::showSentMessages, cli));
     cli->menuItems.emplace("logout", std::bind(&Cli::logOut, cli));
     cli->menuItems.emplace("exit", std::bind(&Cli::quit, cli)); //maybe not for logged in?
     cli->menuItems.emplace("quit", std::bind(&Cli::quit, cli));
