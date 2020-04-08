@@ -143,10 +143,10 @@ size_t User::printMsgs(std::shared_ptr<MailBox> mailBox)
     const auto user_search =
         userMap_.find(msg.sender_id); // sender might already be deleted or just
                                       // having no name set
-    std::cout << (user_search != userMap_.end() && !user_search->second->getName().empty()
-                      ? user_search->second->getName() + " <" + msg.sender_id + " to " + msg.receiver_id + ">"
-                      : msg.sender_id)
-              << ": " << msg.text << std::endl;
+    std::cout << "From: " <<  msg.sender_id
+              << "\nTo:   " <<  msg.receiver_id
+              << "\nMessage:"
+              << msg.text << std::endl;
   }
   return Msgs.size();
 }

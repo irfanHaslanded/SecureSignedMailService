@@ -19,7 +19,7 @@ bool Msg::operator==(const Msg& rhs) const
 std::ostream& operator<<(std::ostream& os, const Msg& msg)
 {
   os << "\nFrom: " << msg.sender_id
-     //<< "\nTo:   " << msg.dest_id
+     << "\nTo:   " << msg.receiver_id
      << "\nMessage: "
      << "\n" << msg.text
      << "\nEncrypted key:"

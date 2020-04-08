@@ -248,10 +248,27 @@ int Cli::getch()
     std::copy(userList.begin(), userList.end(),
               std::ostream_iterator<std::string>(std::cout,"\n"));
   };
-  void Cli::sendMessage(){
-    //Todo functions to read input.
-    //cli->loggedInUser->
-  };
+
+  void Cli::sendMessage()
+  {
+    std::string recipient_id;
+    std::cout<<"To: ";
+    std::cout.flush();
+    std::cin >> recipient_id;
+
+    const char message_terminator = '$';
+    std::string text_message;
+    std::cout<<"Message (enter '" << message_terminator << "' to close the message):"<< std::endl;
+    std::getline(std::cin, text_message, message_terminator);
+    std::cout<< recipient_id << ": " << text_message << std::endl;
+
+    if (cli->loggedInUser->sendMessage(recipient_id, text_message)) {
+      std::cout << "Message sent" << std::endl;
+    } else {
+      std::cout << "No such user" << std::endl;
+    }
+  }
+
   void Cli::showInbox(){
     auto sizeInbox = cli->loggedInUser->showInbox(); //todo understand this function.
     //todo: nice print function.
