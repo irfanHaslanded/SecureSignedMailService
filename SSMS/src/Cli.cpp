@@ -71,92 +71,92 @@ std::string Cli::getPrompt() {
 }
 
 bool Cli::createUser() {
-	std::string userId, password;
+  std::string userId, password;
 
-	std::cout<<"Enter your User Id:";
-	std::cin>>userId;
-	password = Cli::inputPassword("Please enter the password: ");
+  std::cout<<"Enter your User Id:";
+  std::cin>>userId;
+  password = Cli::inputPassword("Please enter the password: ");
 
   try {
-		auto user = User::create(userId);
-		user->setPassword(password);
-		std::cout<<"User Created"<<std::endl;
-		return true;
-	} catch (std::exception& e) {
-		std::cout<<e.what()<<std::endl;
-		return false;
-	}
+    auto user = User::create(userId);
+    user->setPassword(password);
+    std::cout<<"User Created"<<std::endl;
+    return true;
+  } catch (std::exception& e) {
+    std::cout<<e.what()<<std::endl;
+    return false;
+  }
 }
 // Might modify it. Create a function that can be use in both delete and login.
 bool Cli::deleteUser() {
 
-	std::string userId;
-	std::string password;
+  std::string userId;
+  std::string password;
 
-	std::cout<<"Enter userId to delete:"<< std::endl;
-	std::cin>>userId;
+  std::cout<<"Enter userId to delete:"<< std::endl;
+  std::cin>>userId;
   //check if user exist.
-	if (User::get(userId) == nullptr)
-	{
-		std::cout<<"User doesnt exist."<< std::endl;
-	}
-	else
-	{
+  if (User::get(userId) == nullptr)
+  {
+    std::cout<<"User doesnt exist."<< std::endl;
+  }
+  else
+  {
     //user already exists
-	  auto user = User::get(userId);
-	  std::cout<<"Please enter password:"<< std::endl;
-		std::cin>>password;
+    auto user = User::get(userId);
+    std::cout<<"Please enter password:"<< std::endl;
+    std::cin>>password;
     if(user->checkPassword(password))
     {
-    	user->remove(userId);
-    	std::cout<<"User Deleted"<< std::endl;
+      user->remove(userId);
+      std::cout<<"User Deleted"<< std::endl;
     }
     else
     {
-    	std::cout<<"Wrong Password. Cant delete user."<< std::endl;
+      std::cout<<"Wrong Password. Cant delete user."<< std::endl;
     }
 
-	}
+  }
   return true;
 }
 
 bool Cli::logIn()
 {
-	std::string userId;
-	std::string password;
+  std::string userId;
+  std::string password;
 
-	std::cout<<"Enter your userId:"<< std::endl;
-	std::cin>>userId;
-  //check if ANY user exist.
-	if (User::get(userId) == nullptr)
-	{
-		std::cout<<"User doesnt exist."<< std::endl;
-		return false;
-	}
-	else
-	{
-    //user already exists
-	  auto user = User::get(userId);
-	  std::cout<<"Please enter your password:"<< std::endl;
-		std::cin>>password;
+  std::cout<<"Enter your userId:"<< std::endl;
+  std::cin>>userId;
+  //check that user exist.
+  if (User::get(userId) == nullptr)
+  {
+    std::cout<<"User doesnt exist."<< std::endl;
+    return false;
+  }
+  else
+  {
+    auto user = User::get(userId);
+    std::cout<<"Please enter your password:"<< std::endl;
+    std::cin>>password;
     if(user->checkPassword(password))
     {
-  	  cli->loggedInUser = user;
-  	  return true;
+      cli->loggedInUser = user;
+      return true;
     }
     else
     {
-    	std::cout<<"Wrong Password."<< std::endl;
+      std::cout<<"Wrong Password."<< std::endl;
       return false;
     }
 
-	}
+  }
 
 }
 
 void Cli::logOut()
 {
-	cli->loggedInUser = NULL;
+  setMenuNotLoggedInUser();
+  cli->loggedInUser = nullptr;
 }
 
 std::string Cli::inputPassword(const char *prompt)
@@ -171,21 +171,21 @@ std::string Cli::inputPassword(const char *prompt)
   std::cout<<">>";
   ch=getch();
   while((ch=getch())!=RETURN)
-	{
-		 if(ch==BACKSPACE)
-		 {
-				if(password.length()!=0)
-				{
-					std::cout<<"\b \b";
-					password.resize(password.length()-1);
-				}
-		 }
-		 else
-		 {
-			 password+=ch;
-			 std::cout<<'*';
-		 }
-	}
+  {
+     if(ch==BACKSPACE)
+     {
+        if(password.length()!=0)
+        {
+          std::cout<<"\b \b";
+          password.resize(password.length()-1);
+        }
+     }
+     else
+     {
+       password+=ch;
+       std::cout<<'*';
+     }
+  }
   std::cout<<std::endl;
   std::cout<<"You entered:"<< password; //Remove in final version. Only for demo
   std::cout<<std::endl;
@@ -195,18 +195,18 @@ std::string Cli::inputPassword(const char *prompt)
 
 int Cli::getch()
 {
-	int ch;
-	struct termios t_old, t_new;
+  int ch;
+  struct termios t_old, t_new;
 
-	tcgetattr(STDIN_FILENO, &t_old);
-	t_new = t_old;
-	t_new.c_lflag &= ~(ICANON | ECHO);
-	tcsetattr(STDIN_FILENO, TCSANOW, &t_new);
+  tcgetattr(STDIN_FILENO, &t_old);
+  t_new = t_old;
+  t_new.c_lflag &= ~(ICANON | ECHO);
+  tcsetattr(STDIN_FILENO, TCSANOW, &t_new);
 
-	ch = getchar();
+  ch = getchar();
 
-	tcsetattr(STDIN_FILENO, TCSANOW, &t_old);
-	return ch;
+  tcsetattr(STDIN_FILENO, TCSANOW, &t_old);
+  return ch;
 }
 
  void Cli::interpretInput(std::string input)
@@ -222,6 +222,21 @@ int Cli::getch()
 
  };
 
+
+  void Cli::listUsers()
+  {
+    auto userList = cli->loggedInUser->getIdList();
+    //todo: nice print function.
+  };
+  void Cli::sendMessage(){
+    //Todo functions to read input.
+    //cli->loggedInUser->
+  };
+  void Cli::showInbox(){
+    auto sizeInbox = cli->loggedInUser->showInbox(); //todo understand this function.
+    //todo: nice print function.
+  };
+
 // TODO: description, nicer way of handling similar inputs (h, help etc).
 // other set of inputs for logged in and not logged in users, maybe separate class
 // fix exit function
@@ -235,6 +250,23 @@ int Cli::getch()
     cli->menuItems.emplace("Create User", std::bind(&Cli::createUser, cli));
     cli->menuItems.emplace("Delete User", std::bind(&Cli::deleteUser, cli));
     cli->menuItems.emplace("Log in", std::bind(&Cli::logIn, cli));
+    cli->menuItems.emplace("Exit", std::bind(&Cli::logIn, cli));
+  };
+
+
+  void Cli::setMenuLoggedInUser()
+  {
+    menu_map initMap;
+    cli->menuItems = initMap;
+    cli->menuItems.emplace("Help", std::bind(&Cli::printHelpText, cli));
+    cli->menuItems.emplace("help", std::bind(&Cli::printHelpText, cli));
+    cli->menuItems.emplace("?", std::bind(&Cli::printHelpText, cli));
+    cli->menuItems.emplace("Create User", std::bind(&Cli::createUser, cli));
+    cli->menuItems.emplace("Delete User", std::bind(&Cli::deleteUser, cli));
+    cli->menuItems.emplace("List Users", std::bind(&Cli::listUsers, cli));
+    cli->menuItems.emplace("Send Message", std::bind(&Cli::sendMessage, cli));
+    cli->menuItems.emplace("Show Inbox", std::bind(&Cli::showInbox, cli));
+    cli->menuItems.emplace("Log Out", std::bind(&Cli::logOut, cli));
     cli->menuItems.emplace("Exit", std::bind(&Cli::logIn, cli));
   };
 }
