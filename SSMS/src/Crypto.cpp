@@ -25,13 +25,20 @@ static const std::string hashValidChars {
 bool Crypto::validatePassword(const std::string &hash,
                               const std::string &password)
 {
-  return hash == genHash(Crypto::getSalt(hash), password);
+  auto checked_hash = genHash(getSalt(hash), password);
+  auto matching = hash == checked_hash;
+  std::cerr << "\n==== HASH COMPARE BEGIN ====="
+            << "\nstored  : " << hash
+            << "\nchecked : " << checked_hash
+            << "\nmatching: " << (matching ? "YES" : "NO")
+            << "\n==== HASH COMPARE END ====="
+            << std::endl;
+  return matching;
 }
 
 std::string Crypto::genPassword(const std::string &password)
 {
   std::string salt = passTheSalt();
-  std::cout << salt << std::endl; // for UT debugging purposes
   return genHash(salt, password);
 }
 

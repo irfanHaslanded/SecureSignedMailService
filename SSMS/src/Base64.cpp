@@ -10,7 +10,7 @@ struct BIOFreeAll {
   void operator()(BIO *b64) { BIO_free_all(b64); }
 };
 
-const int Base64::BIO_flags = BIO_FLAGS_BASE64_NO_NL;
+const int Base64::BIO_flags = 0; // or it can be BIO_FLAGS_BASE64_NO_NL;
 
 std::string Base64::encode(const std::vector<unsigned char>& binary)
 {

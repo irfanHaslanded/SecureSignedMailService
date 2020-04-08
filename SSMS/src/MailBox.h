@@ -19,6 +19,7 @@ struct Msg {
   Msg();
   Msg(const std::string& sender_id , const std::string& text, const std::string& receiver_id);
   bool operator==(const Msg& rhs) const;
+  friend std::ostream& operator<<(std::ostream& os, const Msg& msg);
 };
 
 /**

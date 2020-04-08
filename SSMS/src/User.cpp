@@ -98,6 +98,10 @@ const std::string& User::getPublicKey() const
 void User::setPassword(const std::string &password)
 {
   hash_ = Crypto::genHash(Crypto::passTheSalt(), password);
+  std::cerr << "\n===== PASSWORD HASH BEGIN ====="
+            << "\n " << id_ << ": " << hash_
+            << "\n===== PASSWORD HASH END ====="
+            << std::endl;
 }
 
 bool User::checkPassword(const std::string &password) const

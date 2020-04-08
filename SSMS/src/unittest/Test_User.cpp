@@ -136,3 +136,11 @@ TEST_F(Test_User, EmptyOutbox)
   alice->emptyOutbox();
   ASSERT_EQ(alice->showOutbox(), 0);
 }
+
+TEST_F(Test_User, SetPassword)
+{
+  auto alice = User::create("alice");
+  alice->setPassword("Alice123");
+  ASSERT_FALSE(alice->checkPassword("alice123"));
+  ASSERT_TRUE(alice->checkPassword("Alice123"));
+}

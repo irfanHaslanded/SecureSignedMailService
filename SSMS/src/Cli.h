@@ -6,7 +6,7 @@
 #include <list>
 #include <unordered_map>
 #include <functional>
-#include <algorithm>>
+#include <algorithm>
 
 typedef std::unordered_map<std::string, std::function<void()>> menu_map;
 
