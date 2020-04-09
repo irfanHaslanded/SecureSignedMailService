@@ -221,8 +221,7 @@ bool Cli::logIn()
   else
   {
     auto user = User::get(userId);
-    std::cout<<"Please enter your password:"<< std::endl;
-    std::cin>>password;
+    password = Cli::inputPassword("Please enter the password: ");
     if(user->checkPassword(password))
     {
       cli->loggedInUser = user;
