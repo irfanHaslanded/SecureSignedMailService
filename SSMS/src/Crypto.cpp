@@ -65,14 +65,12 @@ std::string Crypto::genHash(const std::string &salt,
 
   char* encPwd = crypt_r(rawPwd.c_str(), salt.c_str(), &buf);
   std::string s(encPwd);
-  std::cout << s << std::endl; //for UT debugging purposes
   return s;
 }
 
 std::string Crypto::getSalt(const std::string &hash)
 {
   std::string salt(hash.substr(0, saltSize + saltIdSize + 1));
-  std::cout << "salt is  : " + salt << std::endl; // for UT debugging purposes
   return salt;
 }
 
