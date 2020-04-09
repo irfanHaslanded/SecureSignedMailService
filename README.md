@@ -22,6 +22,11 @@ In a different console, the logs can be followed in real-time:
 tail -f log.txt
 ```
 
+## Password storage
+
+![Salting](https://www.okta.com/sites/default/files/styles/wysiwyg_full_width/public/media/storing_salted_passwords.png)
+
+![Password hash](https://www.php.net/manual/en/images/2a34c7f2e658f6ae74f3869f2aa5886f-crypt-text-rendered.svg)
 
 ## Encryption/decryption flow
 
